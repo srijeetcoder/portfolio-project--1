@@ -39,7 +39,9 @@ export function Navigation() {
 
   useMotionValueEvent(scrollY, 'change', position => {
     updateTone(position);
-    if (reducedMotion || menuOpen || position <= 80) {
+    const focused = document.activeElement;
+    const keyboardFocused = focused?.matches(':focus-visible') && headerRef.current?.contains(focused);
+    if (reducedMotion || menuOpen || position <= 80 || keyboardFocused) {
       showHeader(false);
       lastScroll.current = position;
       return;

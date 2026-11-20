@@ -449,7 +449,7 @@ img, video { max-width: 100%; }
   .f-foot__where, .f-foot__copy, .f-foot__legal { font-size: 12px; white-space: normal; justify-self: start; }
   .foot__row > .f-foot__copy { margin-top: 6px; align-self: start; }
   .foot__row > .f-foot__legal { margin-top: 18px; }
-  .f-foot__legal .f-showall { font-size: 10px; }
+  .f-foot__legal .f-showall { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-size: 12px; white-space: nowrap; }
   .video-dialog { padding: 14px; }
   .player-shell { max-height: calc(100dvh - 28px); }
   .player-header { padding: 17px; }
