@@ -31,13 +31,13 @@ export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
       style={{ '--wordmark-mask': 'url("' + mask + '")' } as CSSProperties}>
       <div className="hero-visual" aria-hidden="true">
         <motion.div className="hero__inner" style={{ y }}>
-        <div className="hero__gradient"><ReferenceBackdrop kind="hero" /></div>
-        <motion.div className="hero__logo-blend" aria-hidden="true"
-          initial={{ opacity: 0, y: -60 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: reduced ? 0 : 1.1, ease: [0.11, 0.06, 0.18, 1] }}>
-          <div className="hero__wordmark" />
-        </motion.div>
-        <div className="hero__silhouette" aria-hidden="true" />
+          <div className="hero__gradient"><ReferenceBackdrop kind="hero" /></div>
+          <motion.div className="hero__logo-blend" aria-hidden="true"
+            initial={{ opacity: 0, y: -60 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reduced ? 0 : 1.1, ease: [0.11, 0.06, 0.18, 1] }}>
+            <div className="hero__wordmark" />
+          </motion.div>
+          <div className="hero__silhouette" aria-hidden="true" />
         </motion.div>
         <motion.div className="hero__fade" style={{ opacity: reduced ? 0 : fade }} />
       </div>
