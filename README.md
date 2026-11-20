@@ -44,6 +44,9 @@ PAPON PORTFOLIO/
     social-cover.webp
   src/
     components/               Sections, liquid text, navigation, gallery, player
+    lib/
+      ribbon/                 Native WebGL surface, reference shaders, viewer flight
+      scrollRuntime.ts        Continuous scroll values and motion coordination
     data/
       portfolio.json          Editable content, contact links, project overrides
       media.generated.json    Scanned local media; generated automatically
@@ -55,6 +58,7 @@ PAPON PORTFOLIO/
     types.ts
   scripts/
     setup-assets.mjs           Prepares reference copies and local assets
+    extract-reference-shaders.mjs  Recovers the reference's surface shaders
     sync-media.mjs             Scans videos and compresses/generates posters
     copy-videos.mjs            Copies original local media into the build
   package.json
@@ -75,7 +79,7 @@ MP4, WebM, and M4V are supported. MP4 and WebM files with the same folder and ba
 
 The scanner reads video dimensions and duration where possible. When a thumbnail is missing, FFmpeg generates a compressed WebP poster. Existing thumbnails are also compressed into `public/posters`. Supported locations include an image with the same basename, a `-poster` or `.poster` suffix, a `-thumbnail` or `.thumbnail` suffix, and matching files in adjacent `thumbnails/` or `posters/` folders.
 
-Original video filenames and contents stay in `videos/`. The production build copies them into `dist/videos/`. Videos are served locally and support byte-range requests for seeking. They are not uploaded to an external service.
+Original video filenames and contents stay in `videos/`. The production build copies them into `dist/videos/`. Videos are served locally and support byte-range requests for seeking. Original footage is excluded from Git; compressed posters and the media manifest are tracked.
 
 The dedicated showreel is used by the hero action and the showreel section. If it is absent, the first suitable local project can act as a temporary showreel. Project filters only appear for categories with actual footage.
 
@@ -115,7 +119,9 @@ Actual filenames identify projects until custom metadata is supplied. For a port
 
 The original downloaded archive in `references/` is preserved. Selected styles are copied to `reference/css/`, with local asset paths adapted for the portfolio. The original font kit's URLs were used to recover the actual Early Sans and Le Kick font files; the frontend serves them locally.
 
-The reference's grain gradient is rendered with `@paper-design/shaders`, with a local texture fallback. Its liquid text effect uses the reference's blur, alpha threshold, and scroll curves. Navigation hides on downward scrolling, returns when scrolling up or receiving keyboard focus, and uses the appropriate colour over the light sections.
+The reference's grain gradient is rendered with `@paper-design/shaders`, with a local texture fallback. Its liquid text effect uses the reference's blur, alpha threshold, and scroll curves. The project rail renders the recovered surface shader in native WebGL 2, including its camera, lighting, cursor dents, and movement that responds to scroll speed. The image carries into the expanded viewer and returns to the gallery on close.
+
+Lenis uses the reference's scroll smoothing settings. Section backgrounds transition through a perceptual colour space, with text contrast maintained throughout. Navigation hides on downward scrolling and returns when scrolling up or receiving keyboard focus. Links use the reference's rolling text and arrow feedback, and service descriptions expand smoothly.
 
 The design follows the supplied reference: `DESIGN_VARIANCE: 8`, `MOTION_INTENSITY: 7`, `VISUAL_DENSITY: 3`. Native CSS preserves its typography, spacing, colours, and section layouts; Motion handles interaction and scroll values. Preview-image provenance is recorded in `reference/images/sources.json`.
 
@@ -123,7 +129,7 @@ The design follows the supplied reference: `DESIGN_VARIANCE: 8`, `MOTION_INTENSI
 
 Project cards initially load compressed posters. Mouse hover requests a muted preview after a short delay. Only one preview can play at a time. Leaving the card, moving it out of view, changing browser tabs, or opening the expanded player stops the preview and releases its source. Reduced motion and data-saving preferences suppress hover previews.
 
-The lazy-loaded video dialog uses native playback controls, starts muted, supports seeking and keyboard dismissal, and restores focus when closed. Mobile playback is inline. Empty-media and playback-error states are included.
+The lazy-loaded video dialog uses native playback controls, starts muted, supports seeking and keyboard dismissal, and restores focus when closed. Its surface transition carries the project image into the player and back; background motion pauses while the viewer is open. Mobile playback is inline. Empty-media and playback-error states are included.
 
 The reference's inline mobile navigation is retained when it fits; phones below 360px use a full-screen menu. The project rail becomes a single column on smaller screens. Layouts have been checked at 1440px, 1280px, 768px, 390px, and 320px. Reduced motion disables liquid effects, parallax, and automatic previews and freezes the background animation.
 
@@ -137,4 +143,10 @@ rtk proxy npm.cmd run typecheck
 rtk proxy npm.cmd run build
 ~~~
 
-Asset setup copies the reference CSS and textures, compresses its seven preview images, recovers any missing reference fonts, and regenerates the favicon and sharing image. It retains the supplied editor wordmark SVGs and leaves the original downloaded archive untouched.
+Asset setup copies the reference CSS and textures, recovers the surface shaders, compresses the seven preview images, recovers any missing reference fonts, and regenerates the favicon and sharing image. It retains the supplied editor wordmark SVGs and leaves the original downloaded archive untouched.
+
+## Git checkpoints
+
+The project is published on the `codex/melon-reference` branch of [portfolio-project--1](https://github.com/srijeetcoder/portfolio-project--1/tree/codex/melon-reference).
+
+During active refinement, `scripts/checkpoint-push.ps1` checks TypeScript, commits changes, and pushes the branch every 120 seconds. It verifies the workspace, branch, and remote, and does not force-push. Its control files and logs live in the ignored `.qa/` directory. Local fixture checks suspend new commits so test media and temporary configuration are not published.
