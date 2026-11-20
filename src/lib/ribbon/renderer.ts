@@ -178,8 +178,12 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
             catch { /* The decoded image remains a compatible texture source. */ }
           }
           if (disposed || contextLost || image.currentSrc !== source || pendingSource !== source) return;
+          const next = texture(bitmap || image);
           deleteTexture(card.poster);
-          card.poster = texture(bitmap || image); card.posterSource = source; dirty = true;
+          card.poster = next; card.posterSource = source; dirty = true;
+        } catch {
+          deleteTexture(card.poster); card.poster = null; card.posterSource = '';
+          card.element.classList.remove('is-gl'); dirty = true;
         } finally {
           bitmap?.close();
           if (pendingSource === source) pendingSource = '';
