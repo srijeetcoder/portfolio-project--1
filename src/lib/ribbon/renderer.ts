@@ -4,6 +4,7 @@ import { scrollRuntime } from '../scrollRuntime';
 import { ribbonBridge } from './bridge';
 import type { FlightRect, RibbonBridge } from './bridge';
 import type { RibbonSettings } from './settings';
+import { compileProgram } from '../compileProgram';
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const smoothstep = (min: number, max: number, value: number) => {
@@ -39,27 +40,11 @@ interface Flight {
 
 export interface RibbonRenderer { frame: (time: number, delta: number) => void; dispose: () => void }
 
-export function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLElement): RibbonRenderer {
+export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLElement, signal?: AbortSignal): Promise<RibbonRenderer> {
   const gl = canvas.getContext('webgl2', { alpha: true, antialias: true, depth: false,
     stencil: false, premultipliedAlpha: true, powerPreference: 'high-performance' });
   if (!gl) throw new Error('WebGL 2 is unavailable.');
-  function compile(kind: number, source: string) {
-    const shader = gl!.createShader(kind)!;
-    gl!.shaderSource(shader, source);
-    gl!.compileShader(shader);
-    if (!gl!.getShaderParameter(shader, gl!.COMPILE_STATUS)) {
-      const message = gl!.getShaderInfoLog(shader);
-      gl!.deleteShader(shader);
-      throw new Error(message || 'Ribbon shader compilation failed.');
-    }
-    return shader;
-  }
-  const vertex = compile(gl.VERTEX_SHADER, ribbonVertexShader);
-  const fragment = compile(gl.FRAGMENT_SHADER, ribbonFragmentShader);
-  const program = gl.createProgram()!;
-  gl.attachShader(program, vertex); gl.attachShader(program, fragment); gl.linkProgram(program);
-  gl.deleteShader(vertex); gl.deleteShader(fragment);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program) || 'Ribbon shader link failed.');
+  const program = await compileProgram(gl, ribbonVertexShader, ribbonFragmentShader, signal);
   const uniforms = new Map<string, WebGLUniformLocation | null>();
   const location = (name: string) => {
     if (!uniforms.has(name)) uniforms.set(name, gl.getUniformLocation(program, name));

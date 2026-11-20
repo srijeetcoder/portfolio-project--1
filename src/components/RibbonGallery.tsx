@@ -17,13 +17,18 @@ export function RibbonGallery({ section, signature }: { section: RefObject<HTMLE
     const restored = () => setEpoch(value => value + 1);
     canvas.addEventListener('webglcontextrestored', restored);
     let cancelled = false;
-    void import('../lib/ribbon/renderer').then(({ createRibbonRenderer }) => {
+    const controller = new AbortController();
+    void import('../lib/ribbon/renderer').then(async ({ createRibbonRenderer }) => {
       if (cancelled) return;
       parent.append(canvas);
-      try { renderer.current = createRibbonRenderer(canvas, parent); }
+      try {
+        const instance = await createRibbonRenderer(canvas, parent, controller.signal);
+        if (cancelled) { instance.dispose(); return; }
+        renderer.current = instance;
+      }
       catch (error) { canvas.dataset.rendererError = error instanceof Error ? error.message : 'Renderer unavailable'; }
     });
-    return () => { cancelled = true; canvas.removeEventListener('webglcontextrestored', restored); renderer.current?.dispose(); renderer.current = null; canvas.remove(); };
+    return () => { cancelled = true; controller.abort(); canvas.removeEventListener('webglcontextrestored', restored); renderer.current?.dispose(); renderer.current = null; canvas.remove(); };
   }, [section, signature, reduced, epoch]);
   return null;
 }

@@ -2,10 +2,11 @@ import { useEffect, useRef } from 'react';
 import { useInView, useReducedMotion } from 'motion/react';
 import { scrollRuntime } from '../lib/scrollRuntime';
 import {
-  ShaderMount,
   getShaderNoiseTexture,
   grainGradientFragmentShader,
 } from '@paper-design/shaders';
+import { createGradientMount } from '../lib/GradientMount';
+import type { GradientMount } from '../lib/GradientMount';
 
 const settings = {
   hero: {
@@ -25,7 +26,7 @@ const heroShader = grainGradientFragmentShader
 
 export function ReferenceBackdrop({ kind }: { kind: 'hero' | 'closing' }) {
   const host = useRef<HTMLDivElement>(null);
-  const shader = useRef<ShaderMount | null>(null);
+  const shader = useRef<GradientMount | null>(null);
   const reducedMotion = useReducedMotion();
   const inView = useInView(host, { margin: '700px 0px', once: true });
   const shouldMount = kind === 'hero' || inView;
@@ -36,6 +37,7 @@ export function ReferenceBackdrop({ kind }: { kind: 'hero' | 'closing' }) {
     const element = host.current;
     if (!element || !shouldMount) return;
     let cancelled = false;
+    const controller = new AbortController();
     const params = settings[kind];
     async function mount() {
       try {
@@ -56,7 +58,7 @@ export function ReferenceBackdrop({ kind }: { kind: 'hero' | 'closing' }) {
         const pixelRatio = window.devicePixelRatio;
         const pixelCount = pixelRatio >= 2 || innerWidth * innerHeight * pixelRatio ** 2 > 4000000
           ? 1600000 : 2600000;
-        shader.current = new ShaderMount(
+        const instance = await createGradientMount(
           element!,
           kind === 'hero' ? heroShader : grainGradientFragmentShader,
           {
@@ -69,9 +71,10 @@ export function ReferenceBackdrop({ kind }: { kind: 'hero' | 'closing' }) {
             u_offsetX: params.offsetX, u_offsetY: params.offsetY,
             u_worldWidth: 0, u_worldHeight: 0, u_noiseTexture: noise,
           },
-          { alpha: true },
-          reduced.current || scrollRuntime.paused ? 0 : 0.8, 10500, 2, pixelCount,
+          reduced.current || scrollRuntime.paused ? 0 : 0.8, 10500, pixelCount, controller.signal,
         );
+        if (cancelled) { instance.dispose(); return; }
+        shader.current = instance;
         element!.classList.add('is-live');
       } catch {
         // The downloaded reference still provides the non-WebGL appearance.
@@ -80,6 +83,7 @@ export function ReferenceBackdrop({ kind }: { kind: 'hero' | 'closing' }) {
     void mount();
     return () => {
       cancelled = true;
+      controller.abort();
       shader.current?.dispose();
       shader.current = null;
       element.classList.remove('is-live');
