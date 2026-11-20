@@ -4,9 +4,57 @@ import { compileProgram } from './compileProgram';
 type Uniform = number | number[] | number[][] | HTMLImageElement;
 export interface GradientMount { setSpeed: (speed: number) => void; dispose: () => void }
 
+async function workerMount(parent: HTMLElement, fragment: string, values: Record<string, Uniform>, speed: number,
+  frame: number, maxPixels: number, signal: AbortSignal): Promise<GradientMount> {
+  const canvas = document.createElement('canvas');
+  const worker = new Worker(new URL('./gradient.worker.ts', import.meta.url), { type: 'module' });
+  const surface = canvas.transferControlToOffscreen();
+  const encoded: Record<string, number | number[] | number[][] | ImageBitmap> = {};
+  const bitmaps: ImageBitmap[] = [];
+  for (const [name, value] of Object.entries(values)) {
+    if (value instanceof HTMLImageElement) { const bitmap = await createImageBitmap(value); encoded[name] = bitmap; bitmaps.push(bitmap); }
+    else encoded[name] = value;
+  }
+  let visible = true, actualSpeed = speed, disposed = false;
+  const dimensions = () => {
+    const box = parent.getBoundingClientRect(), targetRatio = Math.max(2, devicePixelRatio || 1) * (window.visualViewport?.scale || 1);
+    const wantedWidth = Math.round(box.width) * targetRatio, wantedHeight = Math.round(box.height) * targetRatio;
+    const scale = Math.min(1, Math.sqrt(maxPixels / Math.max(1, wantedWidth * wantedHeight)));
+    const width = Math.max(1, Math.round(wantedWidth * scale)), height = Math.max(1, Math.round(wantedHeight * scale));
+    return { width, height, ratio: width / Math.max(1, Math.round(box.width)) };
+  };
+  const abort = () => { worker.terminate(); canvas.remove(); };
+  signal.addEventListener('abort', abort, { once: true });
+  const initialized = new Promise<void>((resolve, reject) => {
+    worker.onmessage = event => {
+      if (event.data.type === 'ready') resolve();
+      if (event.data.type === 'error') reject(new Error(event.data.message));
+    };
+    worker.onerror = event => reject(new Error(event.message));
+    signal.addEventListener('abort', () => reject(new DOMException('Shader setup cancelled', 'AbortError')), { once: true });
+  });
+  worker.postMessage({ type: 'init', canvas: surface, fragment, values: encoded, speed, frame, ...dimensions() }, [surface, ...bitmaps]);
+  try { await initialized; } catch (error) { worker.terminate(); throw error; }
+  if (signal.aborted) { abort(); throw new DOMException('Shader setup cancelled', 'AbortError'); }
+  parent.append(canvas);
+  const update = () => worker.postMessage({ type: 'speed', speed: visible && !document.hidden ? actualSpeed : 0 });
+  const resize = () => { if (!disposed) worker.postMessage({ type: 'resize', ...dimensions() }); };
+  const observer = new ResizeObserver(resize), visibility = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; update(); });
+  observer.observe(parent); visibility.observe(parent); document.addEventListener('visibilitychange', update);
+  window.visualViewport?.addEventListener('resize', resize);
+  return { setSpeed(value) { actualSpeed = value; update(); }, dispose() {
+    disposed = true; observer.disconnect(); visibility.disconnect(); document.removeEventListener('visibilitychange', update);
+    window.visualViewport?.removeEventListener('resize', resize); signal.removeEventListener('abort', abort); abort();
+  } };
+}
+
 // The reference's Paper gradient shaders, with non-blocking program creation.
 export async function createGradientMount(parent: HTMLElement, fragment: string, values: Record<string, Uniform>,
   speed: number, frame: number, maxPixels: number, signal: AbortSignal): Promise<GradientMount> {
+  if (typeof Worker !== 'undefined' && 'transferControlToOffscreen' in HTMLCanvasElement.prototype) {
+    try { return await workerMount(parent, fragment, values, speed, frame, maxPixels, signal); }
+    catch (error) { if (signal.aborted) throw error; }
+  }
   const canvas = document.createElement('canvas');
   const gl = canvas.getContext('webgl2', { alpha: true, antialias: false, depth: false, stencil: false });
   if (!gl) throw new Error('WebGL 2 is unavailable');

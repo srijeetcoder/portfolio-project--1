@@ -8,11 +8,11 @@ export async function compileProgram(gl: WebGL2RenderingContext, vertexSource: s
     if (parallel) {
       while (!gl.getProgramParameter(program, parallel.COMPLETION_STATUS_KHR)) {
         if (signal?.aborted) throw new DOMException('Shader setup cancelled', 'AbortError');
-        await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
+        await new Promise<void>(resolve => typeof requestAnimationFrame === 'function' ? requestAnimationFrame(() => resolve()) : setTimeout(resolve, 8));
       }
     } else {
       // Give the document a paint before querying a driver without parallel compilation.
-      await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+      await new Promise<void>(resolve => typeof requestAnimationFrame === 'function' ? requestAnimationFrame(() => requestAnimationFrame(() => resolve())) : setTimeout(resolve, 16));
     }
     if (signal?.aborted) throw new DOMException('Shader setup cancelled', 'AbortError');
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
