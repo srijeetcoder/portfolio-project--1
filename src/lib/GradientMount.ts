@@ -60,7 +60,8 @@ export async function createGradientMount(parent: HTMLElement, fragment: string,
   const gl = canvas.getContext('webgl2', { alpha: true, antialias: false, depth: false, stencil: false });
   if (!gl) throw new Error('WebGL 2 is unavailable');
   const vertex = vertexShaderSource.replace(/precision\s+(lowp|mediump)\s+float;/g, 'precision highp float;');
-  fragment = fragment.replace(/precision\s+(lowp|mediump)\s+float/g, 'precision highp float');
+  fragment = fragment.replace(/precision\s+(lowp|mediump)\s+float/g, 'precision highp float')
+    .replace(/\b(uniform|varying|attribute)\s+(lowp|mediump)\s+(\w+)/g, '$1 highp $3');
   const program = await compileProgram(gl, vertex, fragment, signal);
   const locations = new Map<string, WebGLUniformLocation | null>();
   const types = new Map<string, number>();

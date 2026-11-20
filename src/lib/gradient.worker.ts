@@ -32,7 +32,8 @@ self.onmessage = async event => {
     gl = canvas.getContext('webgl2', { alpha: true, antialias: false, depth: false, stencil: false });
     if (!gl) throw new Error('Worker WebGL is unavailable');
     program = await compileProgram(gl, vertexShaderSource.replace(/precision\s+(lowp|mediump)\s+float;/g, 'precision highp float;'),
-      data.fragment.replace(/precision\s+(lowp|mediump)\s+float/g, 'precision highp float'));
+      data.fragment.replace(/precision\s+(lowp|mediump)\s+float/g, 'precision highp float')
+        .replace(/\b(uniform|varying|attribute)\s+(lowp|mediump)\s+(\w+)/g, '$1 highp $3'));
     gl.useProgram(program);
     const buffer = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
