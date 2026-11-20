@@ -8,6 +8,7 @@ async function workerMount(parent: HTMLElement, fragment: string, values: Record
   frame: number, maxPixels: number, signal: AbortSignal): Promise<GradientMount> {
   const canvas = document.createElement('canvas');
   const worker = new Worker(new URL('./gradient.worker.ts', import.meta.url), { type: 'module' });
+  parent.append(canvas);
   const surface = canvas.transferControlToOffscreen();
   const encoded: Record<string, number | number[] | number[][] | ImageBitmap> = {};
   const bitmaps: ImageBitmap[] = [];
@@ -34,7 +35,7 @@ async function workerMount(parent: HTMLElement, fragment: string, values: Record
     signal.addEventListener('abort', () => reject(new DOMException('Shader setup cancelled', 'AbortError')), { once: true });
   });
   worker.postMessage({ type: 'init', canvas: surface, fragment, values: encoded, speed, frame, ...dimensions() }, [surface, ...bitmaps]);
-  try { await initialized; } catch (error) { worker.terminate(); throw error; }
+  try { await initialized; } catch (error) { worker.terminate(); canvas.remove(); throw error; }
   if (signal.aborted) { abort(); throw new DOMException('Shader setup cancelled', 'AbortError'); }
   parent.append(canvas);
   const update = () => worker.postMessage({ type: 'speed', speed: visible && !document.hidden ? actualSpeed : 0 });
@@ -53,7 +54,7 @@ export async function createGradientMount(parent: HTMLElement, fragment: string,
   speed: number, frame: number, maxPixels: number, signal: AbortSignal): Promise<GradientMount> {
   if (typeof Worker !== 'undefined' && 'transferControlToOffscreen' in HTMLCanvasElement.prototype) {
     try { return await workerMount(parent, fragment, values, speed, frame, maxPixels, signal); }
-    catch (error) { if (signal.aborted) throw error; }
+    catch (error) { if (signal.aborted) throw error; parent.dataset.workerError = error instanceof Error ? error.message : 'Worker unavailable'; }
   }
   const canvas = document.createElement('canvas');
   const gl = canvas.getContext('webgl2', { alpha: true, antialias: false, depth: false, stencil: false });
