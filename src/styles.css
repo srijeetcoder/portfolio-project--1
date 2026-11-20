@@ -408,7 +408,7 @@ img, video { max-width: 100%; }
   .reference-preview-note { top: calc(100% + 6px); margin: 0; left: var(--gutter); font-size: 10px; max-width: none; }
   #track { padding-top: 24px; }
   .project-description { margin-top: 8px; font-size: 12px; }
-  .project-wrap { margin-bottom: max(0px, calc(var(--caption-height, 60px) + var(--cap-gap) - var(--col-gap))); }
+  .project-wrap { margin-bottom: max(0px, calc(var(--caption-height, 80px) + var(--cap-gap) + 32px - var(--col-gap))); }
   .project-portrait { width: min(70vw, 50svh); }
   .chapter-section { padding: 14vh 0 12vh; }
   .software-section { grid-column: 1/-1; grid-row: auto; margin-top: 5vh; }

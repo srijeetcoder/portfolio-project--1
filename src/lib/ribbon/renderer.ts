@@ -194,7 +194,6 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
       const box = card.hit.getBoundingClientRect();
       card.base = { left: box.left - sectionBox.left, top: box.top - sectionBox.top, width: box.width, height: box.height };
       card.dx = NaN;
-      card.element.style.setProperty('--caption-height', card.caption.offsetHeight + 'px');
     });
     gl!.useProgram(program); matrix('projectionMatrix', projection); matrix('viewMatrix', view); vec3('cameraPosition', 0, 0, ribbonCamera.z);
     float('u_sheetT', settings.span); float('u_sheetC', settings.curve); float('u_sheetP', 1); float('u_bank', settings.bank);

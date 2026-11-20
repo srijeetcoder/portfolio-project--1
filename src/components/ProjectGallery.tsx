@@ -17,6 +17,7 @@ function ProjectCard({ project, activePreview, onPreview, onPlay }: {
 }) {
   const wrapperRef = useRef<HTMLElement>(null);
   const cardRef = useRef<HTMLButtonElement>(null);
+  const captionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const visible = useInView(cardRef);
@@ -38,6 +39,23 @@ function ProjectCard({ project, activePreview, onPreview, onPlay }: {
     if (event.pointerType !== 'mouse' || reducedMotion || connection?.saveData || project.sources.length === 0) return;
     hoverTimer.current = setTimeout(() => onPreview(project.id), 350);
   }
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    const caption = captionRef.current;
+    if (!wrapper || !caption) return;
+    // Metadata needs its own space even when motion or WebGL is unavailable.
+    const measure = () => {
+      const height = Math.ceil(caption.getBoundingClientRect().height) + 'px';
+      if (wrapper.style.getPropertyValue('--caption-height') !== height) {
+        wrapper.style.setProperty('--caption-height', height);
+      }
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(caption);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!visible && activePreview === project.id) onPreview(null);
@@ -86,7 +104,7 @@ function ProjectCard({ project, activePreview, onPreview, onPlay }: {
           <span className="project-hover-play" aria-hidden="true"><Play size={22} fill="currentColor" strokeWidth={0} /></span>
         </span>
       </button>
-      <div className="proj__cap project-caption">
+      <div ref={captionRef} className="proj__cap project-caption">
         <h3 className="proj__title project-title">{project.title}</h3>
         <p className="proj__kind project-category">{project.category}{project.year ? ', ' + project.year : ''}</p>
         <p className="project-description">{project.description}</p>
