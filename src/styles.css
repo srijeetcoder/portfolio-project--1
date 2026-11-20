@@ -137,7 +137,8 @@ img, video { max-width: 100%; }
 .project-portrait { width: min(30vw, 46svh); }
 .project-card { border: 0; padding: 0; background: none; color: inherit; }
 .project-media { display: block; position: relative; width: 100%; height: 100%; }
-.ribbon-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 2; }
+.ribbon-canvas { position: fixed; inset: 0; width: 100vw; height: 100dvh; pointer-events: none; z-index: 2; }
+.ribbon-flight { z-index: 5; }
 .ribbon-live .proj.is-gl .proj__img, .ribbon-live .proj.is-gl .preview-video { visibility: hidden; }
 .ribbon-live .project-card { overflow: visible; }
 .ribbon-live .project-hover-play { display: none; }
@@ -245,13 +246,21 @@ img, video { max-width: 100%; }
 
 .video-dialog::backdrop {
   background: rgb(0 0 0 / 86%);
+  animation: viewer-backdrop-in .45s var(--ease-reveal) both;
 }
+.video-dialog.is-closing::backdrop { animation: viewer-backdrop-out var(--close-duration, 660ms) ease-in-out both; }
+.video-dialog:not(.has-ribbon-flight) .player-shell { animation: viewer-in .45s var(--ease-reveal) both; }
+.player-shell { transition: opacity .18s; }
+.has-ribbon-flight .player-shell[data-opening="true"], .video-dialog.is-closing .player-shell { opacity: 0; }
+@keyframes viewer-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes viewer-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes viewer-in { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; transform: none; } }
 
 .player-shell {
   width: min(1000px, 100%);
   max-height: calc(100dvh - 64px);
   overflow: auto;
-  background: #171916;
+  background: #180606;
   border: 1px solid #3b3f35;
   border-radius: var(--radius);
 }
@@ -288,7 +297,7 @@ img, video { max-width: 100%; }
   min-height: 400px;
   padding: 40px;
   text-align: center;
-  background: #111310;
+  background: #130202;
 }
 
 .player-empty > svg {
@@ -314,7 +323,7 @@ img, video { max-width: 100%; }
 .player-video-wrap {
   position: relative;
   width: 100%;
-  background: #050605;
+  background: #080000;
 }
 
 .player-video {

@@ -16,7 +16,7 @@ export function MediaPanel({ item, onPlay, hero = false }: {
       }>
         <img
           src={poster}
-          alt={item.isPlaceholder ? 'Temporary cinematic coastline image for the upcoming showreel' : 'Showreel poster'}
+          alt={item.isPlaceholder ? 'Red grain artwork for the upcoming showreel' : 'Showreel poster'}
           width={item.width || 1800}
           height={item.height || 1200}
           loading={hero ? 'eager' : 'lazy'}

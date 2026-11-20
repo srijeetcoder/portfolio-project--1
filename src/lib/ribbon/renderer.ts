@@ -261,6 +261,7 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLEle
   addEventListener('resize', resize);
   const lost = (event: Event) => {
     event.preventDefault(); contextLost = true;
+    bridge.cancel();
     section.classList.remove('ribbon-live');
     cards.forEach(card => { card.element.classList.remove('is-gl'); card.caption.style.visibility = ''; card.caption.style.transform = ''; });
     canvas.dataset.rendererError = 'WebGL context lost';
@@ -350,7 +351,7 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLEle
         model.fill(0); model[0] = card.pose.w; model[5] = card.pose.h; model[10] = 1; model[15] = 1; model[12] = card.pose.x; model[13] = card.pose.y;
         matrix('modelMatrix', model); vec2('u_res', card.pose.w, card.pose.h);
         vec2('u_size', card.image.naturalWidth, card.image.naturalHeight); vec2('u_sizeB', ...card.videoSize);
-        float('u_corner', settings.radius / card.base.height); float('u_hover', card.hover.value); vec2('u_mouse', card.mouse.x, card.mouse.y);
+        float('u_corner', settings.radius / (card.pose.h * height / (2 * halfHeight))); float('u_hover', card.hover.value); vec2('u_mouse', card.mouse.x, card.mouse.y);
         float('u_flat', card.flat); float('u_lift', card.lift); vec2('u_stretch', ...card.stretch);
         float('u_fade', card.videoTexture ? card.fade.value : 0);
         gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, card.poster);

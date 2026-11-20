@@ -12,6 +12,7 @@ Set-Location -LiteralPath $taskRoot
 $controlRoot = Join-Path $taskRoot '.qa'
 [System.IO.Directory]::CreateDirectory($controlRoot) | Out-Null
 $stopFile = Join-Path $controlRoot 'push-stop'
+$pauseFile = Join-Path $controlRoot 'push-pause'
 $statusFile = Join-Path $controlRoot 'push-status.json'
 $logFile = Join-Path $controlRoot 'push.log'
 $expectedRemote = 'https://github.com/srijeetcoder/portfolio-project--1.git'
@@ -51,6 +52,11 @@ try {
     if ([DateTime]::UtcNow -lt $nextPush) { Start-Sleep -Milliseconds 500; continue }
     $nextPush = $nextPush.AddSeconds($IntervalSeconds)
     Test-TaskRepository
+    if (Test-Path -LiteralPath $pauseFile) {
+      $push = Invoke-TaskGit -Arguments @('push', $Remote, $Branch)
+      Write-TaskStatus 'waiting' 'Local media checks are running; the published checkpoint stays clean.'
+      continue
+    }
     $stage = Invoke-TaskGit -Arguments @('add', '-A')
     if ($stage.Code -ne 0) { Write-TaskStatus 'error' 'Could not stage this checkpoint.'; continue }
     $diff = Invoke-TaskGit -Arguments @('diff', '--cached', '--quiet')
