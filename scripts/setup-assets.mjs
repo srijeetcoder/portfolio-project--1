@@ -40,6 +40,11 @@ for (const name of previews) {
     .resize({ width: 1280, withoutEnlargement: true })
     .webp({ quality: 82 })
     .toFile(resolve(images, 'reference-' + name + '.webp'));
+  for (const width of [640, 960]) {
+    await sharp(resolve(referenceRoot, 'media/projects', name, 'thumbnail.webp'))
+      .resize({ width, withoutEnlargement: true }).webp({ quality: 82 })
+      .toFile(resolve(images, 'reference-' + name + '-' + width + '.webp'));
+  }
 }
 
 const fontCSS = await readFile(resolve(root, 'references/use.typekit.net/omg1nuw.css'), 'utf8');

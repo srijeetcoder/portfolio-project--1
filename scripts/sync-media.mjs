@@ -138,6 +138,18 @@ async function createPoster(video, thumbnail, metadata, output) {
   }
 }
 
+async function posterSources(output) {
+  const info = await sharp(output).metadata();
+  const sources = [{ src: '/posters/' + basename(output), width: info.width }];
+  for (const width of [640, 960]) {
+    if (width >= info.width) continue;
+    const path = output.replace(/\.webp$/, '-' + width + '.webp');
+    await sharp(output).resize({ width }).webp({ quality: 78, effort: 4 }).toFile(path);
+    sources.push({ src: '/posters/' + basename(path), width });
+  }
+  return sources.sort((a, b) => a.width - b.width);
+}
+
 function category(relative) {
   const folder = relative.includes('/') ? relative.split('/')[0] : '';
   return {
@@ -177,7 +189,8 @@ for (const [key, variants] of groups) {
   })).digest('hex');
   const output = resolve(posterRoot, 'project-' + id + '.webp');
   const cachedItem = cached.get(id);
-  if (cachedItem?.fingerprint === fingerprint && cachedItem.poster && await exists(output)) {
+  if (cachedItem?.fingerprint === fingerprint && cachedItem.poster && cachedItem.posterSources?.length && await exists(output) &&
+      (await Promise.all(cachedItem.posterSources.map(source => exists(resolve(root, 'public', source.src.slice(1)))))).every(Boolean)) {
     media.push(cachedItem);
     continue;
   }
@@ -192,6 +205,7 @@ for (const [key, variants] of groups) {
       type: supported.get(extname(variant).toLowerCase()),
     })),
     poster: hasPoster ? '/posters/project-' + id + '.webp' : null,
+    posterSources: hasPoster ? await posterSources(output) : [],
     ...metadata,
     ...category(file),
     fingerprint,

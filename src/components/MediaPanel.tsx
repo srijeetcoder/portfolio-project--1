@@ -16,6 +16,8 @@ export function MediaPanel({ item, onPlay, hero = false }: {
       }>
         <img
           src={poster}
+          srcSet={item.posterSources?.map(source => mediaUrl(source.src) + ' ' + source.width + 'w').join(', ')}
+          sizes="(max-width: 809px) calc(100vw - 40px), 72vw"
           alt={item.isPlaceholder ? 'Red grain artwork for the upcoming showreel' : 'Showreel poster'}
           width={item.width || 1800}
           height={item.height || 1200}

@@ -25,12 +25,13 @@ function enrichProject(item: MediaLibrary['projects'][number]): Project {
     category: details.category || item.category,
     categoryId: details.category || item.categoryId,
     poster: details.poster || item.poster,
+    posterSources: details.poster ? [] : item.posterSources,
     year: details.year,
     isPlaceholder: false,
   };
 }
 
-const placeholderImages = referencePreviews.map(poster => ({ poster, imageAspect: '16 / 9' }));
+const placeholderImages = referencePreviews.map(visual => ({ ...visual, imageAspect: '16 / 9' }));
 
 export const projects: Project[] = mediaLibrary.projects.length
   ? mediaLibrary.projects.map(enrichProject)

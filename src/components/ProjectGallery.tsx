@@ -69,6 +69,8 @@ function ProjectCard({ project, activePreview, onPreview, onPlay }: {
         aria-label={project.isPlaceholder ? 'Preview project placeholder' : 'Watch ' + project.title}>
         <span className="project-media">
           <img className="proj__img" src={poster}
+            srcSet={project.posterSources?.map(source => (source.src.startsWith('/posters/') ? mediaUrl(source.src) : source.src) + ' ' + source.width + 'w').join(', ')}
+            sizes={portrait ? '(max-width: 809px) 70vw, 30vw' : '(max-width: 809px) calc(100vw - 48px), 52vw'}
             alt={project.isPlaceholder ? 'Reference layout preview awaiting original video work' : project.title + ' poster'}
             width={project.width || 1280} height={project.height || 720} loading="lazy" decoding="async"
             onError={event => {
