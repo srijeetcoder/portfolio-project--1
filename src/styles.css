@@ -91,7 +91,12 @@ img, video { max-width: 100%; }
 .mobile-menu nav a { display: flex; align-items: center; justify-content: space-between; font-size: 48px; letter-spacing: -.05em; }
 .mobile-menu-footer { margin-top: auto; color: rgb(255 255 255 / .65); font-size: 15px; padding-block: 24px; }
 
-.hero { --wordmark-mask: url("../reference/images/editor-wordmark.svg"); }
+.hero { --wordmark-mask: url("../reference/images/editor-wordmark.svg"); -webkit-mask-image: none; mask-image: none; }
+.hero-visual {
+  position: absolute; inset: 0; overflow: clip; pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 max(var(--wm-foot), calc(100% - 14vh)), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 max(var(--wm-foot), calc(100% - 14vh)), transparent 100%);
+}
 .hero__gradient { background-image: url("../reference/images/reference-hero.webp"); }
 .hero__wordmark, .hero__silhouette {
   -webkit-mask-image: var(--wordmark-mask);
@@ -400,6 +405,10 @@ img, video { max-width: 100%; }
   .topbar { top: 16px; }
   .topbar__logo img { width: 77px; height: 35px; }
   .hero__gradient { background-image: url("../reference/images/reference-hero.webp"); }
+  .hero-visual {
+    -webkit-mask-image: linear-gradient(to bottom, #000 max(var(--wm-foot), calc(100% - 16vh)), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 max(var(--wm-foot), calc(100% - 16vh)), transparent 100%);
+  }
   .atf-intro { grid-column: 1; }
   .atf-meta { align-items: flex-start; }
   .hero-actions { top: calc(100% + 74px); gap: 28px; }
@@ -449,6 +458,17 @@ img, video { max-width: 100%; }
   .player-video { height: min(58dvh, 540px); }
   .player-description { padding-inline: 18px; }
   .player-error { padding: 24px 18px; gap: 18px; }
+}
+@media (min-width: 810px) and (max-height: 700px) {
+  .hero {
+    --wm-top: calc(.8vh - max(0px, 32.4vw - 70svh));
+    --atf-hero: min(100svh, max(83svh, calc(var(--wm-foot) + 180px)));
+  }
+  .atf-what { top: calc(var(--wm-foot) + clamp(14px, 1.5vw, 28px)); }
+}
+@media (max-width: 809.98px) and (max-height: 700px) {
+  .hero { --atf-hero: max(64svh, calc(var(--wm-foot) + 246px)); }
+  .atf-what { top: calc(var(--wm-foot) + 24px); bottom: auto; }
 }
 @media (max-width: 359px) {
   .desktop-nav { display: none; }

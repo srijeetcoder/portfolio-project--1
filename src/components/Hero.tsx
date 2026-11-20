@@ -29,7 +29,8 @@ export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
   return (
     <section id="hero" className="hero" ref={heroRef} aria-labelledby="hero-title"
       style={{ '--wordmark-mask': 'url("' + mask + '")' } as CSSProperties}>
-      <motion.div className="hero__inner" style={{ y }}>
+      <div className="hero-visual" aria-hidden="true">
+        <motion.div className="hero__inner" style={{ y }}>
         <div className="hero__gradient"><ReferenceBackdrop kind="hero" /></div>
         <motion.div className="hero__logo-blend" aria-hidden="true"
           initial={{ opacity: 0, y: -60 }} animate={{ opacity: 1, y: 0 }}
@@ -37,9 +38,10 @@ export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
           <div className="hero__wordmark" />
         </motion.div>
         <div className="hero__silhouette" aria-hidden="true" />
-        <h1 className="sr-only" id="hero-title">{portfolio.identity.role}. {portfolio.hero.headline.join(' ')}</h1>
-      </motion.div>
-      <motion.div className="hero__fade" style={{ opacity: reduced ? 0 : fade }} />
+        </motion.div>
+        <motion.div className="hero__fade" style={{ opacity: reduced ? 0 : fade }} />
+      </div>
+      <h1 className="sr-only" id="hero-title">{portfolio.identity.role}. {portfolio.hero.headline.join(' ')}</h1>
       <motion.div className="atf-what hero-copy" style={{ y }}
         initial={{ opacity: 0 }} animate={{ opacity: 1 }}
         transition={{ duration: reduced ? 0 : 0.8, delay: reduced ? 0 : 0.2 }}>
