@@ -46,6 +46,9 @@ PAPON PORTFOLIO/
     components/               Sections, liquid text, navigation, gallery, player
     lib/
       ribbon/                 Native WebGL surface, reference shaders, viewer flight
+      gradient.worker.ts      Background shader rendering outside the UI thread
+      GradientMount.ts        Worker coordination and compatible WebGL fallback
+      compileProgram.ts       Non-blocking shader compilation
       scrollRuntime.ts        Continuous scroll values and motion coordination
     data/
       portfolio.json          Editable content, contact links, project overrides
@@ -59,6 +62,7 @@ PAPON PORTFOLIO/
   scripts/
     setup-assets.mjs           Prepares reference copies and local assets
     extract-reference-shaders.mjs  Recovers the reference's surface shaders
+    prerender.mjs             Emits static page markup before client hydration
     sync-media.mjs             Scans videos and compresses/generates posters
     copy-videos.mjs            Copies original local media into the build
   package.json
@@ -119,7 +123,7 @@ Actual filenames identify projects until custom metadata is supplied. For a port
 
 The original downloaded archive in `references/` is preserved. Selected styles are copied to `reference/css/`, with local asset paths adapted for the portfolio. The original font kit's URLs were used to recover the actual Early Sans and Le Kick font files; the frontend serves them locally.
 
-The reference's grain gradient is rendered with `@paper-design/shaders`, with a local texture fallback. Its liquid text effect uses the reference's blur, alpha threshold, and scroll curves. The project rail renders the recovered surface shader in native WebGL 2, including its camera, lighting, cursor dents, and movement that responds to scroll speed. The image carries into the expanded viewer and returns to the gallery on close.
+The grain gradient uses the reference's Paper shaders, with a local texture fallback. Its shader compiles asynchronously and renders in an OffscreenCanvas worker where supported, keeping its frame loop off the UI thread. Its liquid text effect uses the reference's blur, alpha threshold, and scroll curves. The project rail renders the recovered surface shader in native WebGL 2, including its camera, lighting, cursor dents, and movement that responds to scroll speed. The image carries into the expanded viewer and returns to the gallery on close.
 
 Lenis uses the reference's scroll smoothing settings. Section backgrounds transition through a perceptual colour space, with text contrast maintained throughout. Navigation hides on downward scrolling and returns when scrolling up or receiving keyboard focus. Links use the reference's rolling text and arrow feedback, and service descriptions expand smoothly.
 
@@ -133,7 +137,7 @@ The lazy-loaded video dialog uses native playback controls, starts muted, suppor
 
 The reference's inline mobile navigation is retained when it fits; phones below 360px use a full-screen menu. The project rail becomes a single column on smaller screens. Layouts have been checked at 1440px, 1280px, 768px, 390px, and 320px. Reduced motion disables liquid effects, parallax, and automatic previews and freezes the background animation.
 
-SEO and social-sharing metadata come from the central configuration. Local fonts and compressed images are bundled into the site; actual videos are requested only when a preview or player is activated.
+SEO and social-sharing metadata come from the central configuration. Production emits prerendered page markup and hydrates it in React. Local fonts and responsive 640px, 960px, and full-size compressed posters are bundled into the site; actual videos are requested only when a preview or player is activated. Motion features and the gallery renderer load separately.
 
 ## Regenerate reference copies and assets
 
