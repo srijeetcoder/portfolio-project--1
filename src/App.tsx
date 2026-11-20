@@ -11,6 +11,7 @@ import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { ReferenceBackdrop } from './components/ReferenceBackdrop';
 import { SmoothScroll } from './components/SmoothScroll';
+import { SceneTransitions } from './components/SceneTransitions';
 import type { Project } from './types';
 
 const VideoPlayer = lazy(() => import('./components/VideoPlayer'));
@@ -23,6 +24,7 @@ export default function App() {
   return (
     <>
       <SmoothScroll />
+      <SceneTransitions />
       <a className="skip-link" href="#main-content">Skip to content</a>
       <Navigation />
       <main id="main-content">

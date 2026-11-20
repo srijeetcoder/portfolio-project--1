@@ -43,7 +43,6 @@ function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false) {
       definitions.append(filter);
       return {
         element, filter, blur, matrix, max: 0, last: -1,
-        ink: getComputedStyle(element).color,
         originalColor: element.style.color,
         originalFilter: element.style.filter,
       };
@@ -70,7 +69,7 @@ function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false) {
         record.matrix.setAttribute('values', `1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 ${gain.toFixed(3)} ${bias.toFixed(3)}`);
         record.element.style.filter = `url(#${record.filter.id})`;
         const red = Math.min(1, radius / (8 * record.max / 40)) * 100;
-        record.element.style.color = `color-mix(in srgb, var(--liquid-from) ${red.toFixed(1)}%, ${record.ink})`;
+        record.element.style.color = `color-mix(in srgb, var(--liquid-from) ${red.toFixed(1)}%, currentColor)`;
       });
     };
 

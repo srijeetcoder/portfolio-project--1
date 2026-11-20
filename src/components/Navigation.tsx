@@ -21,9 +21,7 @@ export function Navigation() {
   const hidden = useRef(false);
   const lastScroll = useRef(0);
   const motionControl = useRef<{ stop: () => void } | null>(null);
-  const paperSections = useRef<{ top: number; bottom: number; background: string; id: string }[]>([]);
   const heroBottom = useRef(750);
-  const currentTone = useRef('');
 
   function showHeader(hide: boolean) {
     if (hide === hidden.current) return;
@@ -36,13 +34,6 @@ export function Navigation() {
   function updateTone(position: number) {
     const header = headerRef.current;
     if (!header) return;
-    const paper = paperSections.current.find(section => position + 48 >= section.top && position + 48 < section.bottom);
-    const tone = paper?.id || 'dark';
-    if (tone !== currentTone.current) {
-      currentTone.current = tone;
-      header.classList.toggle('is-paper', Boolean(paper));
-      header.style.setProperty('--header-bg', paper?.background || 'var(--black)');
-    }
     header.classList.toggle('is-solid', position >= heroBottom.current - 96);
   }
 
@@ -67,16 +58,8 @@ export function Navigation() {
     const main = document.querySelector('main');
     if (!main) return;
     const measure = () => {
-      const position = scrollY.get();
-      paperSections.current = [...document.querySelectorAll<HTMLElement>('[data-tone="white"]')].map(section => {
-        const box = section.getBoundingClientRect();
-        const styles = getComputedStyle(section);
-        return { top: box.top + position, bottom: box.bottom + position, id: section.id,
-          background: styles.getPropertyValue('--f-bg').trim() || styles.backgroundColor };
-      });
       heroBottom.current = document.getElementById('hero')?.offsetHeight || 750;
-      currentTone.current = '';
-      updateTone(position);
+      updateTone(scrollY.get());
     };
     const observer = new ResizeObserver(measure);
     observer.observe(main);
