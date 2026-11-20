@@ -5,6 +5,7 @@ import { ribbonBridge } from './bridge';
 import type { FlightRect, RibbonBridge } from './bridge';
 import type { RibbonSettings } from './settings';
 import { compileProgram } from '../compileProgram';
+import { prewarmRibbon } from './warmup';
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const smoothstep = (min: number, max: number, value: number) => {
@@ -41,6 +42,8 @@ interface Flight {
 export interface RibbonRenderer { frame: (time: number, delta: number) => void; dispose: () => void }
 
 export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLElement, signal?: AbortSignal): Promise<RibbonRenderer> {
+  await prewarmRibbon();
+  if (signal?.aborted) throw new DOMException('Gallery setup cancelled', 'AbortError');
   const gl = canvas.getContext('webgl2', { alpha: true, antialias: true, depth: false,
     stencil: false, premultipliedAlpha: true, powerPreference: 'high-performance' });
   if (!gl) throw new Error('WebGL 2 is unavailable.');

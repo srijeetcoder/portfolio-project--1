@@ -15,9 +15,7 @@ function ProjectCard({ project, activePreview, onPreview, onPlay }: {
   onPreview: (id: string | null) => void;
   onPlay: (project: Project) => void;
 }) {
-  const wrapperRef = useRef<HTMLElement>(null);
   const cardRef = useRef<HTMLButtonElement>(null);
-  const captionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const visible = useInView(cardRef);
@@ -41,23 +39,6 @@ function ProjectCard({ project, activePreview, onPreview, onPlay }: {
   }
 
   useEffect(() => {
-    const wrapper = wrapperRef.current;
-    const caption = captionRef.current;
-    if (!wrapper || !caption) return;
-    // Metadata needs its own space even when motion or WebGL is unavailable.
-    const measure = () => {
-      const height = Math.ceil(caption.getBoundingClientRect().height) + 'px';
-      if (wrapper.style.getPropertyValue('--caption-height') !== height) {
-        wrapper.style.setProperty('--caption-height', height);
-      }
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(caption);
-    return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
     if (!visible && activePreview === project.id) onPreview(null);
   }, [visible, activePreview, project.id, onPreview]);
 
@@ -79,7 +60,7 @@ function ProjectCard({ project, activePreview, onPreview, onPlay }: {
   }, []);
 
   return (
-    <article ref={wrapperRef} data-project-id={project.id} className={'proj project-wrap' + (portrait ? ' project-portrait' : '')}
+    <article data-project-id={project.id} className={'proj project-wrap' + (portrait ? ' project-portrait' : '')}
       style={{ '--project-ratio': aspect } as CSSProperties}>
       <button ref={cardRef} className="proj__card project-card"
         onPointerEnter={beginPreview} onPointerLeave={endPreview} onBlur={endPreview}
@@ -104,7 +85,7 @@ function ProjectCard({ project, activePreview, onPreview, onPlay }: {
           <span className="project-hover-play" aria-hidden="true"><Play size={22} fill="currentColor" strokeWidth={0} /></span>
         </span>
       </button>
-      <div ref={captionRef} className="proj__cap project-caption">
+      <div className="proj__cap project-caption">
         <h3 className="proj__title project-title">{project.title}</h3>
         <p className="proj__kind project-category">{project.category}{project.year ? ', ' + project.year : ''}</p>
         <p className="project-description">{project.description}</p>
@@ -120,6 +101,26 @@ export function ProjectGallery({ onPlay, playerOpen }: { onPlay: (project: Proje
   const placeholders = projects.every(project => project.isPlaceholder);
   const categories = Array.from(new Map(projects.filter(project => !project.isPlaceholder).map(project => [project.categoryId, project.category])).entries());
   const displayedProjects = filter === 'all' ? projects : projects.filter(project => project.categoryId === filter);
+  const signature = displayedProjects.map(project => project.id).join('|');
+
+  useEffect(() => {
+    const wrappers = [...(sectionRef.current?.querySelectorAll<HTMLElement>('.project-wrap') || [])];
+    const captions = wrappers.map(wrapper => wrapper.querySelector<HTMLElement>('.project-caption')!);
+    // Read all caption sizes before changing spacing. This also serves the
+    // native gallery when reduced motion or a missing WebGL context is used.
+    const measure = () => {
+      const heights = captions.map(caption => Math.ceil(caption.getBoundingClientRect().height) + 'px');
+      wrappers.forEach((wrapper, index) => {
+        if (wrapper.style.getPropertyValue('--caption-height') !== heights[index]) {
+          wrapper.style.setProperty('--caption-height', heights[index]);
+        }
+      });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    captions.forEach(caption => observer.observe(caption));
+    return () => observer.disconnect();
+  }, [signature]);
 
   useEffect(() => {
     const stopPreviews = () => setActivePreview(null);
@@ -156,7 +157,7 @@ export function ProjectGallery({ onPlay, playerOpen }: { onPlay: (project: Proje
         {displayedProjects.map(project => <ProjectCard key={project.id} project={project}
           activePreview={playerOpen ? null : activePreview} onPreview={setActivePreview} onPlay={onPlay} />)}
       </div>
-      <RibbonGallery section={sectionRef} signature={displayedProjects.map(project => project.id).join('|')} />
+      <RibbonGallery section={sectionRef} signature={signature} />
     </section>
   );
 }

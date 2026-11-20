@@ -15,6 +15,10 @@
     <link rel="preload" href="/reference/fonts/early-sans.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/reference/images/reference-hero.webp" as="image" fetchpriority="high" />
     <title>Video Editor | Portfolio</title>
+    <script type="module">
+      import { prewarmRibbon } from '/src/lib/ribbon/warmup.ts';
+      void prewarmRibbon();
+    </script>
   </head>
   <body>
     <div id="root"></div>
