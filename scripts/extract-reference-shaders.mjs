@@ -18,7 +18,14 @@ function expand(text) {
 const vertex = '#version 300 es\nprecision highp float;\nin vec3 position;\nin vec2 uv;\nuniform mat4 modelMatrix;\nuniform mat4 viewMatrix;\nuniform mat4 projectionMatrix;\n' +
   expand(pieces.W).replaceAll('varying ', 'out ');
 const fragment = '#version 300 es\nprecision highp float;\nuniform vec3 cameraPosition;\nout vec4 fragmentColor;\n' +
-  expand(pieces.A).replaceAll('varying ', 'in ').replaceAll('texture2D(', 'texture(').replaceAll('gl_FragColor', 'fragmentColor');
+  expand(pieces.A).replaceAll('varying ', 'in ').replaceAll('texture2D(', 'texture(').replaceAll('gl_FragColor', 'fragmentColor')
+    .replace('uniform float u_alpha;', 'uniform float u_alpha;\nuniform float u_focus;')
+    .replace('float aa = max(fwidth(d), 0.0001);', `float aa = max(fwidth(d), 0.0001);
+        // Keyboard focus follows the same curved surface as the artwork.
+        float focusEdge = 1.0 - smoothstep(1.5 * aa, 2.5 * aa, -d);
+        float focusInner = 1.0 - smoothstep(3.5 * aa, 4.5 * aa, -d);
+        tex.rgb = mix(tex.rgb, vec3(0.035, 0.0, 0.0), u_focus * focusInner);
+        tex.rgb = mix(tex.rgb, vec3(1.0), u_focus * focusEdge);`);
 if (/\$\{/.test(vertex + fragment)) throw new Error('A reference shader include was not expanded.');
 const destination = resolve(root, 'src/lib/ribbon/shaders.ts');
 await mkdir(dirname(destination), { recursive: true });

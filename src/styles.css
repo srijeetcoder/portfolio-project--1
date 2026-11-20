@@ -148,6 +148,7 @@ img, video { max-width: 100%; }
 .ribbon-flight { z-index: 5; }
 .ribbon-live .proj.is-gl .proj__img, .ribbon-live .proj.is-gl .preview-video { visibility: hidden; }
 .ribbon-live .project-card { overflow: visible; }
+.ribbon-live .proj.is-gl .project-card:focus-visible { outline: 0; }
 .ribbon-live .project-hover-play { display: none; }
 .ribbon-live .project-caption { z-index: 3; }
 .ribbon-mobile .project-caption {

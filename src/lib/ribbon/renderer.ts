@@ -28,7 +28,7 @@ interface Card {
   poster: WebGLTexture | null; posterSource: string; videoTexture: WebGLTexture | null;
   video: HTMLVideoElement | null; videoSize: [number, number]; videoFrame: number | null; videoDirty: boolean;
   pointer: { x: number; y: number } | null; mouse: { x: number; y: number };
-  hover: Tween; fade: Tween; drawn: boolean; dx: number; captionOpacity: string; captionPosition: string;
+  hover: Tween; fade: Tween; drawn: boolean; focused: boolean; dx: number; captionOpacity: string; captionPosition: string;
   flat: number; lift: number; stretch: [number, number];
   disposeEvents: () => void;
 }
@@ -151,7 +151,7 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
     const card: Card = { element, hit, image, caption, base: { left: 0, top: 0, width: 1, height: 1 }, pose: { x: 0, y: 0, w: 1, h: 1 },
       poster: null, posterSource: '', videoTexture: null, video: null, videoSize: [1, 1], videoFrame: null, videoDirty: false,
       pointer: null, mouse: { x: 0.5, y: 0.5 }, hover: { from: 0, to: 0, value: 0, started: 0, duration: 500 },
-      fade: { from: 0, to: 0, value: 0, started: 0, duration: 350 }, drawn: false, dx: NaN, captionOpacity: '', captionPosition: '',
+      fade: { from: 0, to: 0, value: 0, started: 0, duration: 350 }, drawn: false, focused: false, dx: NaN, captionOpacity: '', captionPosition: '',
       flat: 0, lift: 0, stretch: [0, 0], disposeEvents: () => {} };
     const hoverTo = (value: number) => { card.hover = { ...card.hover, from: card.hover.value, to: value, started: lastTime || performance.now() }; dirty = true; };
     const enter = (event: PointerEvent) => {
@@ -292,6 +292,8 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
         }
       }
       cards.forEach(card => {
+        const focused = !held && document.activeElement === card.hit && card.hit.matches(':focus-visible');
+        if (focused !== card.focused) { card.focused = focused; dirty = true; }
         const rect = { top: box.top + card.base.top, left: box.left + card.base.left, width: card.base.width, height: card.base.height };
         card.flat = 0; card.lift = 0; card.stretch = [0, 0];
         if (flight?.card === card && !forceDraw) {
@@ -343,6 +345,7 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
         matrix('modelMatrix', model); vec2('u_res', card.pose.w, card.pose.h);
         vec2('u_size', card.image.naturalWidth, card.image.naturalHeight); vec2('u_sizeB', ...card.videoSize);
         float('u_corner', settings.radius / (card.pose.h * height / (2 * halfHeight))); float('u_hover', card.hover.value); vec2('u_mouse', card.mouse.x, card.mouse.y);
+        float('u_focus', card.focused ? 1 : 0);
         float('u_flat', card.flat); float('u_lift', card.lift); vec2('u_stretch', ...card.stretch);
         float('u_fade', card.videoTexture ? card.fade.value : 0);
         gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, card.poster);

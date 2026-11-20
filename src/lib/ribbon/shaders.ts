@@ -276,6 +276,7 @@ uniform vec2 u_sizeB;
 uniform float u_fade;       // 0 = u_texture, 1 = u_texB
 uniform vec2 u_res;
 uniform float u_alpha;
+uniform float u_focus;
 uniform float u_shade;      // depth-shade strength
 uniform float u_shadeS;     // depth-shade spread: below 1 widens it
 uniform vec3 u_shadeColor;  // receding parts sink toward this (raw bytes / 255)
@@ -575,6 +576,11 @@ void main() {
 		float r = min(u_corner, min(mid.x, mid.y));
 		float d = roundedBox(vUv * sz, mid, r);
 		float aa = max(fwidth(d), 0.0001);
+        // Keyboard focus follows the same curved surface as the artwork.
+        float focusEdge = 1.0 - smoothstep(1.5 * aa, 2.5 * aa, -d);
+        float focusInner = 1.0 - smoothstep(3.5 * aa, 4.5 * aa, -d);
+        tex.rgb = mix(tex.rgb, vec3(0.035, 0.0, 0.0), u_focus * focusInner);
+        tex.rgb = mix(tex.rgb, vec3(1.0), u_focus * focusEdge);
 		alpha *= 1.0 - smoothstep(-aa, aa, d);
 	}
 
