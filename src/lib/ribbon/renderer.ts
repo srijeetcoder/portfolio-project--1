@@ -1,6 +1,8 @@
 import { ribbonFragmentShader, ribbonVertexShader } from './shaders';
 import { ribbonCamera, ribbonDesktop, ribbonPhone } from './settings';
 import { scrollRuntime } from '../scrollRuntime';
+import { ribbonBridge } from './bridge';
+import type { FlightRect, RibbonBridge } from './bridge';
 import type { RibbonSettings } from './settings';
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
@@ -26,7 +28,13 @@ interface Card {
   video: HTMLVideoElement | null; videoSize: [number, number]; videoFrame: number | null; videoDirty: boolean;
   pointer: { x: number; y: number } | null; mouse: { x: number; y: number };
   hover: Tween; fade: Tween; drawn: boolean; dx: number; captionOpacity: string; captionPosition: string;
+  flat: number; lift: number; stretch: [number, number];
   disposeEvents: () => void;
+}
+interface Flight {
+  card: Card; dialog: HTMLDialogElement; figure: () => FlightRect; video: HTMLVideoElement | null;
+  from: number; to: number; value: number; previous: number; started: number; duration: number;
+  handoff: number | null; resolve: ((complete: boolean) => void) | null;
 }
 
 export interface RibbonRenderer { frame: (time: number, delta: number) => void; dispose: () => void }
@@ -83,6 +91,8 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLEle
   let width = innerWidth, height = innerHeight, halfWidth = 1, halfHeight = 1;
   let settings: RibbonSettings = ribbonDesktop;
   let dirty = true, disposed = false, contextLost = false, previouslyDrawn = false, velocity = 0, lastScroll = NaN, lastTime = 0;
+  let flight: Flight | null = null, held: Flight | null = null, snapshot: HTMLCanvasElement | null = null;
+  let forceDraw = false, removeSnapshotAfterDraw = false;
   const projection = new Float32Array(16), model = new Float32Array(16);
   const view = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -ribbonCamera.z, 1]);
 
@@ -156,7 +166,8 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLEle
     const card: Card = { element, hit, image, caption, base: { left: 0, top: 0, width: 1, height: 1 }, pose: { x: 0, y: 0, w: 1, h: 1 },
       poster: null, posterSource: '', videoTexture: null, video: null, videoSize: [1, 1], videoFrame: null, videoDirty: false,
       pointer: null, mouse: { x: 0.5, y: 0.5 }, hover: { from: 0, to: 0, value: 0, started: 0, duration: 500 },
-      fade: { from: 0, to: 0, value: 0, started: 0, duration: 350 }, drawn: false, dx: NaN, captionOpacity: '', captionPosition: '', disposeEvents: () => {} };
+      fade: { from: 0, to: 0, value: 0, started: 0, duration: 350 }, drawn: false, dx: NaN, captionOpacity: '', captionPosition: '',
+      flat: 0, lift: 0, stretch: [0, 0], disposeEvents: () => {} };
     const hoverTo = (value: number) => { card.hover = { ...card.hover, from: card.hover.value, to: value, started: lastTime || performance.now() }; dirty = true; };
     const enter = (event: PointerEvent) => {
       if (event.pointerType === 'touch') return;
@@ -220,7 +231,7 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLEle
     card.videoFrame = null;
   }
   function syncVideo(card: Card, time: number) {
-    const video = card.element.querySelector<HTMLVideoElement>('.preview-video.preview-ready');
+    const video = held?.card === card && held.video ? held.video : card.element.querySelector<HTMLVideoElement>('.preview-video.preview-ready');
     const ready = video && video.readyState >= 2 && video.videoWidth > 0 ? video : null;
     if (ready !== card.video) {
       cancelVideo(card); card.video = ready; card.videoDirty = Boolean(ready);
@@ -258,30 +269,56 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLEle
   section.classList.add('ribbon-live'); canvas.classList.add('is-live');
   measure();
 
-  return {
+  const renderer: RibbonRenderer = {
     frame(time, delta) {
       lastTime = time;
       if (disposed || contextLost || document.hidden) return;
       const scroll = scrollRuntime.smooth ? scrollRuntime.y : window.scrollY;
       const normalizedDelta = clamp(delta / (1000 / 60), 0, 3);
-      const targetVelocity = Math.min(1, Math.pow(Math.tanh((scrollRuntime.smooth ? scrollRuntime.lag : 0) / settings.velocityNorm), 2));
+      if (held && !flight && !forceDraw) return;
+      const targetVelocity = held ? velocity : Math.min(1, Math.pow(Math.tanh((scrollRuntime.smooth ? scrollRuntime.lag : 0) / settings.velocityNorm), 2));
       const nextVelocity = velocity + (targetVelocity - velocity) * (1 - Math.pow(1 - settings.velocitySmooth, normalizedDelta));
       if (Math.abs(nextVelocity - velocity) > 0.0001 || Math.abs(scroll - lastScroll) > 0.01) dirty = true;
       velocity = nextVelocity < 0.0005 ? 0 : nextVelocity; lastScroll = scroll;
       const box = section.getBoundingClientRect();
-      if (box.bottom < -height * 0.5 || box.top > height * 1.5) {
+      if (!flight && !forceDraw && (box.bottom < -height * 0.5 || box.top > height * 1.5)) {
         if (previouslyDrawn) { gl.clear(gl.COLOR_BUFFER_BIT); previouslyDrawn = false; }
         cards.forEach(card => { if (settings.captionPinned) card.caption.style.visibility = 'hidden'; });
         return;
       }
       gl.useProgram(program);
+      let completedFlight: 'open' | 'close' | null = null;
+      if (flight && !forceDraw) {
+        const progress = clamp((time - flight.started) / flight.duration);
+        flight.value = flight.from + (flight.to - flight.from) * (1 - Math.cos(Math.PI * progress)) / 2;
+        dirty = true;
+        if (progress >= 1 && flight.to === 0) completedFlight = 'close';
+        if (progress >= 1 && flight.to === 1) {
+          if (flight.handoff === null) { flight.handoff = time; flight.resolve?.(true); flight.resolve = null; }
+          canvas.style.opacity = String(1 - clamp((time - flight.handoff) / 200));
+          if (time - flight.handoff >= 200) completedFlight = 'open';
+        }
+      }
       cards.forEach(card => {
-        const top = box.top + card.base.top, left = box.left + card.base.left;
-        card.pose = { w: 2 * halfWidth * card.base.width / width, h: 2 * halfHeight * card.base.height / height,
-          x: -halfWidth + halfWidth * card.base.width / width + left / width * 2 * halfWidth,
-          y: halfHeight - halfHeight * card.base.height / height - top / height * 2 * halfHeight };
-        if (tweenValue(card.hover, time, true)) dirty = true;
-        if (card.pointer) {
+        const rect = { top: box.top + card.base.top, left: box.left + card.base.left, width: card.base.width, height: card.base.height };
+        card.flat = 0; card.lift = 0; card.stretch = [0, 0];
+        if (flight?.card === card && !forceDraw) {
+          const target = flight.figure(), p = flight.value;
+          const dx = target.left + target.width / 2 - (rect.left + rect.width / 2);
+          const dy = target.top + target.height / 2 - (rect.top + rect.height / 2);
+          rect.left += (target.left - rect.left) * p; rect.top += (target.top - rect.top) * p;
+          rect.width += (target.width - rect.width) * p; rect.height += (target.height - rect.height) * p;
+          card.flat = p;
+          card.lift = 4 * 0.03 * p * (1 - p) * 2 * halfHeight * rect.height / height;
+          const travel = (p - flight.previous) / Math.max(0.25, normalizedDelta);
+          card.stretch = [dx * travel * 0.08 * 2 * halfWidth / width, -dy * travel * 0.08 * 2 * halfHeight / height];
+          flight.previous = p;
+        }
+        card.pose = { w: 2 * halfWidth * rect.width / width, h: 2 * halfHeight * rect.height / height,
+          x: -halfWidth + halfWidth * rect.width / width + rect.left / width * 2 * halfWidth,
+          y: halfHeight - halfHeight * rect.height / height - rect.top / height * 2 * halfHeight };
+        if (!held && tweenValue(card.hover, time, true)) dirty = true;
+        if (!held && card.pointer) {
           const target = pointerUv(card, card.pointer.x, card.pointer.y), follow = 1 - Math.pow(1 - settings.dentFollow, normalizedDelta);
           const dx = (target.x - card.mouse.x) * follow, dy = (target.y - card.mouse.y) * follow;
           card.mouse.x += dx; card.mouse.y += dy;
@@ -290,7 +327,7 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLEle
         syncVideo(card, time);
         const dx = Math.round(settings.diagonal * card.pose.y * width / (2 * halfWidth) * 10) / 10;
         if (dx !== card.dx) { card.dx = dx; card.element.style.transform = dx ? `translate3d(${dx}px,0,0)` : ''; }
-        card.drawn = Boolean(card.poster) && top < height * 1.5 && top + card.base.height > -height * 0.5;
+        card.drawn = Boolean(card.poster) && (flight && !forceDraw ? flight.card === card : rect.top < height * 1.5 && rect.top + rect.height > -height * 0.5);
         const opacity = settings.captionFade ? 1 - smoothstep(settings.captionFrom, settings.captionTo, Math.abs(card.pose.y / halfHeight)) : 1;
         const alpha = opacity.toFixed(3);
         if (alpha !== card.captionOpacity) { card.captionOpacity = alpha; card.caption.style.opacity = alpha; }
@@ -314,6 +351,7 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLEle
         matrix('modelMatrix', model); vec2('u_res', card.pose.w, card.pose.h);
         vec2('u_size', card.image.naturalWidth, card.image.naturalHeight); vec2('u_sizeB', ...card.videoSize);
         float('u_corner', settings.radius / card.base.height); float('u_hover', card.hover.value); vec2('u_mouse', card.mouse.x, card.mouse.y);
+        float('u_flat', card.flat); float('u_lift', card.lift); vec2('u_stretch', ...card.stretch);
         float('u_fade', card.videoTexture ? card.fade.value : 0);
         gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, card.poster);
         gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, card.videoTexture || card.poster);
@@ -323,8 +361,22 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLEle
       previouslyDrawn = true; dirty = false;
       canvas.dataset.drawnCards = String(cards.filter(card => card.drawn).length);
       canvas.dataset.velocity = velocity.toFixed(3);
+      if (removeSnapshotAfterDraw && !flight) { snapshot?.remove(); snapshot = null; removeSnapshotAfterDraw = false; }
+      if (completedFlight === 'open') {
+        cancelVideo(flight!.card); flight!.card.video = null;
+        flight = null; gl.clear(gl.COLOR_BUFFER_BIT); previouslyDrawn = false;
+        section.append(canvas); canvas.classList.remove('ribbon-flight'); canvas.style.opacity = '';
+      } else if (completedFlight === 'close') {
+        const finished = flight!;
+        flight = null; held = null;
+        section.append(canvas); canvas.classList.remove('ribbon-flight'); canvas.style.opacity = '';
+        removeSnapshotAfterDraw = true; dirty = true;
+        finished.resolve?.(true);
+      }
     },
     dispose() {
+      bridge.cancel();
+      if (ribbonBridge.current === bridge) ribbonBridge.current = null;
       disposed = true; observer.disconnect(); removeEventListener('resize', resize); canvas.removeEventListener('webglcontextlost', lost);
       cards.forEach(card => {
         card.disposeEvents(); cancelVideo(card); card.element.style.transform = ''; card.element.classList.remove('is-gl');
@@ -336,4 +388,59 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLEle
       if (!gl.isContextLost()) gl.clear(gl.COLOR_BUFFER_BIT);
     },
   };
+  function captureBackground(card: Card) {
+    forceDraw = true; dirty = true; renderer.frame(lastTime || 0, 16.67); forceDraw = false;
+    snapshot?.remove();
+    snapshot = document.createElement('canvas'); snapshot.className = 'ribbon-canvas ribbon-snapshot';
+    snapshot.setAttribute('aria-hidden', 'true'); snapshot.width = canvas.width; snapshot.height = canvas.height;
+    const context = snapshot.getContext('2d');
+    if (context) {
+      context.drawImage(canvas, 0, 0); context.globalCompositeOperation = 'destination-out';
+      const ratio = canvas.width / width;
+      context.beginPath();
+      for (let side = 0; side < 4; side++) for (let step = 0; step <= 36; step++) {
+        const t = step / 36;
+        const uv = side === 0 ? [t, 0] : side === 1 ? [1, t] : side === 2 ? [1 - t, 1] : [0, 1 - t];
+        const point = projectPoint(card, uv[0], uv[1]);
+        if (side === 0 && step === 0) context.moveTo(point.x * ratio, point.y * ratio);
+        else context.lineTo(point.x * ratio, point.y * ratio);
+      }
+      context.closePath(); context.fill();
+    }
+    section.append(snapshot);
+  }
+  const bridge: RibbonBridge = {
+    open(id, dialog, figure, video) {
+      const card = cards.find(item => item.element.dataset.projectId === id);
+      if (!card?.poster || disposed || contextLost) return Promise.resolve(false);
+      captureBackground(card);
+      flight?.resolve?.(false);
+      canvas.classList.add('ribbon-flight'); canvas.style.opacity = ''; dialog.append(canvas);
+      return new Promise(resolve => {
+        flight = { card, dialog, figure, video, from: 0, to: 1, value: 0, previous: 0,
+          started: lastTime, duration: 850, handoff: null, resolve };
+        held = flight; dirty = true;
+      });
+    },
+    close(id) {
+      if (!held || held.card.element.dataset.projectId !== id || disposed || contextLost) return Promise.resolve(false);
+      const from = flight?.value ?? 1;
+      flight?.resolve?.(false);
+      canvas.classList.add('ribbon-flight'); canvas.style.opacity = ''; held.dialog.append(canvas);
+      return new Promise(resolve => {
+        flight = { ...held!, from, to: 0, value: from, previous: from, started: lastTime,
+          duration: Math.max(120, 660 * from), handoff: null, resolve };
+        held = flight; dirty = true;
+      });
+    },
+    holding: id => Boolean(held && held.card.element.dataset.projectId === id),
+    cancel() {
+      flight?.resolve?.(false); flight = null; held = null;
+      snapshot?.remove(); snapshot = null;
+      if (canvas.parentNode !== section) section.append(canvas);
+      canvas.classList.remove('ribbon-flight'); canvas.style.opacity = ''; dirty = true;
+    },
+  };
+  ribbonBridge.current = bridge;
+  return renderer;
 }

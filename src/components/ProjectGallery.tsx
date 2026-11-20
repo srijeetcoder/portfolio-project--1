@@ -60,7 +60,7 @@ function ProjectCard({ project, activePreview, onPreview, onPlay }: {
   }, []);
 
   return (
-    <article ref={wrapperRef} className={'proj project-wrap' + (portrait ? ' project-portrait' : '')}
+    <article ref={wrapperRef} data-project-id={project.id} className={'proj project-wrap' + (portrait ? ' project-portrait' : '')}
       style={{ '--project-ratio': aspect } as CSSProperties}>
       <button ref={cardRef} className="proj__card project-card"
         onPointerEnter={beginPreview} onPointerLeave={endPreview} onBlur={endPreview}
