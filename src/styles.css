@@ -134,6 +134,15 @@ img, video { max-width: 100%; }
 .project-portrait { width: min(30vw, 46svh); }
 .project-card { border: 0; padding: 0; background: none; color: inherit; }
 .project-media { display: block; position: relative; width: 100%; height: 100%; }
+.ribbon-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 2; }
+.ribbon-live .proj.is-gl .proj__img, .ribbon-live .proj.is-gl .preview-video { visibility: hidden; }
+.ribbon-live .project-card { overflow: visible; }
+.ribbon-live .project-hover-play { display: none; }
+.ribbon-live .project-caption { z-index: 3; }
+.ribbon-mobile .project-caption {
+  position: fixed; top: 0; left: 0; right: auto; max-width: calc(var(--col-w) * .7);
+  width: max-content; visibility: hidden; will-change: transform;
+}
 .preview-video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .3s; }
 .preview-ready { opacity: 1; }
 .project-hover-play {
@@ -370,7 +379,7 @@ img, video { max-width: 100%; }
   .reference-preview-note { top: calc(100% + 6px); margin: 0; left: var(--gutter); font-size: 10px; max-width: none; }
   #track { padding-top: 24px; }
   .project-description { margin-top: 8px; font-size: 12px; }
-  .project-wrap { margin-bottom: 48px; }
+  .project-wrap { margin-bottom: max(0px, calc(var(--caption-height, 60px) + var(--cap-gap) - var(--col-gap))); }
   .project-portrait { width: min(70vw, 50svh); }
   .chapter-section { padding: 14vh 0 12vh; }
   .software-section { grid-column: 1/-1; grid-row: auto; margin-top: 5vh; }

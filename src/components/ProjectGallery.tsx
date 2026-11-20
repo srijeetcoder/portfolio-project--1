@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Play } from 'lucide-react';
-import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { useInView, useReducedMotion } from 'motion/react';
 import { mediaUrl, projects } from '../data/content';
 import { visuals } from '../data/visuals';
 import { LiquidHeading } from './LiquidText';
+import { RibbonGallery } from './RibbonGallery';
 import type { CSSProperties, PointerEvent } from 'react';
 import type { Project } from '../types';
 
-function ProjectCard({ project, activePreview, onPreview, onPlay, mobile }: {
+function ProjectCard({ project, activePreview, onPreview, onPlay }: {
   project: Project;
   activePreview: string | null;
   onPreview: (id: string | null) => void;
   onPlay: (project: Project) => void;
-  mobile: boolean;
 }) {
   const wrapperRef = useRef<HTMLElement>(null);
   const cardRef = useRef<HTMLButtonElement>(null);
@@ -20,11 +20,6 @@ function ProjectCard({ project, activePreview, onPreview, onPlay, mobile }: {
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const visible = useInView(cardRef);
   const reducedMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: wrapperRef, offset: ['start end', 'end start'] });
-  const x = useTransform(scrollYProgress, [0, 0.5, 1], [-140, 0, 100]);
-  const rotateY = useTransform(scrollYProgress, [0, 0.5, 1], [-10, 0, 10]);
-  const skewY = useTransform(scrollYProgress, [0, 0.5, 1], [-2, 0, 2]);
-  const captionOpacity = useTransform(scrollYProgress, [0, 0.18, 0.27, 0.72, 0.82, 1], [0, 0, 1, 1, 0, 0]);
   const [videoReady, setVideoReady] = useState(false);
   const previewing = !reducedMotion && visible && activePreview === project.id && project.sources.length > 0;
   const portrait = Boolean(project.width && project.height && project.height > project.width);
@@ -65,12 +60,9 @@ function ProjectCard({ project, activePreview, onPreview, onPlay, mobile }: {
   }, []);
 
   return (
-    <motion.article ref={wrapperRef} className={'proj project-wrap' + (portrait ? ' project-portrait' : '')}
+    <article ref={wrapperRef} className={'proj project-wrap' + (portrait ? ' project-portrait' : '')}
       style={{ '--project-ratio': aspect } as CSSProperties}>
-      <motion.button ref={cardRef} className="proj__card project-card"
-        style={{ x: reducedMotion || mobile ? 0 : x, rotateY: reducedMotion || mobile ? 0 : rotateY, skewY: reducedMotion || mobile ? 0 : skewY,
-          rotateX: reducedMotion || mobile ? 0 : -18, skewX: reducedMotion || mobile ? 0 : -5,
-          scale: reducedMotion || mobile ? 1 : 1.035, transformPerspective: 1600 }}
+      <button ref={cardRef} className="proj__card project-card"
         onPointerEnter={beginPreview} onPointerLeave={endPreview} onBlur={endPreview}
         onClick={() => { endPreview(); onPreview(null); onPlay(project); }}
         aria-label={project.isPlaceholder ? 'Preview project placeholder' : 'Watch ' + project.title}>
@@ -90,34 +82,29 @@ function ProjectCard({ project, activePreview, onPreview, onPlay, mobile }: {
           )}
           <span className="project-hover-play" aria-hidden="true"><Play size={22} fill="currentColor" strokeWidth={0} /></span>
         </span>
-      </motion.button>
-      <motion.div className="proj__cap project-caption"
-        style={{ x: reducedMotion || mobile ? 0 : x, opacity: reducedMotion || mobile ? 1 : captionOpacity }}>
+      </button>
+      <div className="proj__cap project-caption">
         <h3 className="proj__title project-title">{project.title}</h3>
         <p className="proj__kind project-category">{project.category}{project.year ? ', ' + project.year : ''}</p>
         <p className="project-description">{project.description}</p>
-      </motion.div>
-    </motion.article>
+      </div>
+    </article>
   );
 }
 
 export function ProjectGallery({ onPlay, playerOpen }: { onPlay: (project: Project) => void; playerOpen: boolean }) {
+  const sectionRef = useRef<HTMLElement>(null);
   const [filter, setFilter] = useState('all');
   const [activePreview, setActivePreview] = useState<string | null>(null);
-  const [mobile, setMobile] = useState(() => window.matchMedia('(max-width: 809.98px)').matches);
   const placeholders = projects.every(project => project.isPlaceholder);
   const categories = Array.from(new Map(projects.filter(project => !project.isPlaceholder).map(project => [project.categoryId, project.category])).entries());
   const displayedProjects = filter === 'all' ? projects : projects.filter(project => project.categoryId === filter);
 
   useEffect(() => {
-    const media = window.matchMedia('(max-width: 809.98px)');
-    const update = () => setMobile(media.matches);
-    media.addEventListener('change', update);
     const stopPreviews = () => setActivePreview(null);
     document.addEventListener('visibilitychange', stopPreviews);
     window.addEventListener('blur', stopPreviews);
     return () => {
-      media.removeEventListener('change', update);
       document.removeEventListener('visibilitychange', stopPreviews);
       window.removeEventListener('blur', stopPreviews);
     };
@@ -128,7 +115,7 @@ export function ProjectGallery({ onPlay, playerOpen }: { onPlay: (project: Proje
   }, [playerOpen]);
 
   return (
-    <section id="work" className="work work-section" aria-labelledby="work-title">
+    <section id="work" className="work work-section" ref={sectionRef} aria-labelledby="work-title">
       <div className="f-work__head">
         <LiquidHeading id="work-title" className="work__heading">Latest Work</LiquidHeading>
         <a className="f-showall" href="#track" onClick={() => { setFilter('all'); setActivePreview(null); }}>
@@ -146,8 +133,9 @@ export function ProjectGallery({ onPlay, playerOpen }: { onPlay: (project: Proje
       )}
       <div id="track" className="gallery-grid">
         {displayedProjects.map(project => <ProjectCard key={project.id} project={project}
-          activePreview={playerOpen ? null : activePreview} onPreview={setActivePreview} onPlay={onPlay} mobile={mobile} />)}
+          activePreview={playerOpen ? null : activePreview} onPreview={setActivePreview} onPlay={onPlay} />)}
       </div>
+      <RibbonGallery section={sectionRef} signature={displayedProjects.map(project => project.id).join('|')} />
     </section>
   );
 }

@@ -13,7 +13,7 @@ for (const name of ['T', 'M', 'P', 'D', 'k', 'R', 'W', 'A']) {
 }
 function expand(text) {
   return text.replaceAll('${z(s.p)}', '0.25').replaceAll('${z(s.N)}', '0.45')
-    .replace(/\$\{([TM PDkR])\}/g, (_, name) => expand(pieces[name]));
+    .replace(/\$\{([TMPDkR])\}/g, (_, name) => expand(pieces[name]));
 }
 const vertex = '#version 300 es\nprecision highp float;\nin vec3 position;\nin vec2 uv;\nuniform mat4 modelMatrix;\nuniform mat4 viewMatrix;\nuniform mat4 projectionMatrix;\n' +
   expand(pieces.W).replaceAll('varying ', 'out ');
