@@ -46,6 +46,8 @@ PAPON PORTFOLIO/
     components/               Sections, liquid text, navigation, gallery, player
     lib/
       ribbon/                 Native WebGL surface, reference shaders, viewer flight
+        warmup.worker.ts      Prepares the GPU shader cache outside the UI thread
+      mountReferenceBackdrop.ts  Loads and prepares the reference background shaders
       gradient.worker.ts      Background shader rendering outside the UI thread
       GradientMount.ts        Worker coordination and compatible WebGL fallback
       compileProgram.ts       Non-blocking shader compilation
@@ -123,7 +125,7 @@ Actual filenames identify projects until custom metadata is supplied. For a port
 
 The original downloaded archive in `references/` is preserved. Selected styles are copied to `reference/css/`, with local asset paths adapted for the portfolio. The original font kit's URLs were used to recover the actual Early Sans and Le Kick font files; the frontend serves them locally.
 
-The grain gradient uses the reference's Paper shaders, with a local texture fallback. Its shader compiles asynchronously and renders in an OffscreenCanvas worker where supported, keeping its frame loop off the UI thread. Its liquid text effect uses the reference's blur, alpha threshold, and scroll curves. The project rail renders the recovered surface shader in native WebGL 2, including its camera, lighting, cursor dents, and movement that responds to scroll speed. The image carries into the expanded viewer and returns to the gallery on close.
+The grain gradient uses the reference's Paper shaders, with a local texture fallback. Background setup loads separately from page hydration, and its shader compiles asynchronously and renders in an OffscreenCanvas worker where supported. The reference colours are stored as their exact sRGB bytes, avoiding runtime canvas readbacks. Its liquid text effect uses the reference's blur, alpha threshold, and scroll curves. The project rail renders the recovered surface shader in native WebGL 2, including its camera, lighting, cursor dents, and movement that responds to scroll speed. A worker prepares the driver's shader cache before the gallery initializes, and poster pixels are prepared asynchronously. The image carries into the expanded viewer and returns to the gallery on close.
 
 Lenis uses the reference's scroll smoothing settings. Section backgrounds transition through a perceptual colour space, with text contrast maintained throughout. Navigation hides on downward scrolling and returns when scrolling up or receiving keyboard focus. Links use the reference's rolling text and arrow feedback, and service descriptions expand smoothly.
 
@@ -135,7 +137,11 @@ Project cards initially load compressed posters. Mouse hover requests a muted pr
 
 The lazy-loaded video dialog uses native playback controls, starts muted, supports seeking and keyboard dismissal, and restores focus when closed. Its surface transition carries the project image into the player and back; background motion pauses while the viewer is open. Mobile playback is inline. Empty-media and playback-error states are included.
 
-The reference's inline mobile navigation is retained when it fits; phones below 360px use a full-screen menu. The project rail becomes a single column on smaller screens. Layouts have been checked at 1440px, 1280px, 768px, 390px, and 320px. Reduced motion disables liquid effects, parallax, and automatic previews and freezes the background animation.
+The reference's inline mobile navigation is retained when it fits; phones below 360px use a full-screen menu. Keyboard focus keeps the navigation visible while scrolling. The project rail becomes a single column on smaller screens, with measured caption space and a clear gap before the following project. The keyboard outline follows the gallery's curved surface. Offscreen cards release their horizontal transforms so later sections do not create horizontal scrolling, and live card replacements rebuild their renderer targets.
+
+Layouts have been checked at 1440x900, 1280x720, 1280x600, 768x1024, 768x600, 390x844, 320x720, and 320x600. Short screens retain visible hero actions; the background mask is separate from the readable introduction and links. All sections were inspected at desktop and phone sizes. Reduced motion disables liquid effects, parallax, and automatic previews and freezes the background animation; the native gallery retains correct caption spacing when WebGL is unavailable.
+
+Isolated browser fixtures verified muted playback, lazy video sources, category filters, portrait presentation, seeking, error retry, showreel playback, reverse viewer transitions, and focus restoration on desktop and phone. The fixtures live in the ignored `.qa/` folder and are injected only into test browser sessions. They do not change the site's media manifest, personal configuration, or original videos.
 
 SEO and social-sharing metadata come from the central configuration. Production emits prerendered page markup and hydrates it in React. Local fonts and responsive 640px, 960px, and full-size compressed posters are bundled into the site; actual videos are requested only when a preview or player is activated. Motion features and the gallery renderer load separately.
 
