@@ -145,6 +145,8 @@ Isolated browser fixtures verified muted playback, lazy video sources, category 
 
 SEO and social-sharing metadata come from the central configuration. Production emits prerendered page markup and hydrates it in React. Local fonts and responsive 640px, 960px, and full-size compressed posters are bundled into the site; actual videos are requested only when a preview or player is activated. Motion features and the gallery renderer load separately.
 
+The final production Lighthouse audits scored **99 desktop / 88 simulated mobile** for performance and **100** for accessibility, best practices, and SEO on both devices. Desktop LCP was 0.9 seconds with 20 ms of blocking time; simulated mobile LCP was 3.9 seconds with 30 ms of blocking time. Both recorded zero layout shift. The slower mobile simulation remains limited by the large hero asset's paint timing; results should be measured again with the owner's final footage and content.
+
 ## Regenerate reference copies and assets
 
 ~~~powershell
