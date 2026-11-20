@@ -1,0 +1,48 @@
+{
+  "purpose": "Downloaded reference layout previews. Replace these with the editor original project posters.",
+  "reference": "https://melon.studio/",
+  "previews": [
+    {
+      "name": "mastercard-music",
+      "original": "references/melon.studio/media/projects/mastercard-music/thumbnail.webp"
+    },
+    {
+      "name": "allaces-games",
+      "original": "references/melon.studio/media/projects/allaces-games/thumbnail.webp"
+    },
+    {
+      "name": "onedynamics",
+      "original": "references/melon.studio/media/projects/onedynamics/thumbnail.webp"
+    },
+    {
+      "name": "sawicki-legal",
+      "original": "references/melon.studio/media/projects/sawicki-legal/thumbnail.webp"
+    },
+    {
+      "name": "huuuge-games",
+      "original": "references/melon.studio/media/projects/huuuge-games/thumbnail.webp"
+    },
+    {
+      "name": "ipg-interact",
+      "original": "references/melon.studio/media/projects/ipg-interact/thumbnail.webp"
+    },
+    {
+      "name": "hipromine",
+      "original": "references/melon.studio/media/projects/hipromine/thumbnail.webp"
+    }
+  ],
+  "fonts": [
+    {
+      "family": "lekick-regular",
+      "source": "https://use.typekit.net/af/ea70a2/0000000000000000774a1c09/31/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3"
+    },
+    {
+      "family": "early-sans-variable",
+      "source": "https://use.typekit.net/af/b563d2/00000000000000007755b0da/31/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n3&v=3"
+    },
+    {
+      "family": "early-sans-variable",
+      "source": "https://use.typekit.net/af/af06b8/00000000000000007755b0db/31/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i3&v=3"
+    }
+  ]
+}

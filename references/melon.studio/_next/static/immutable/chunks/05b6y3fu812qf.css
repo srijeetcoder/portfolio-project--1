@@ -1,0 +1,264 @@
+.f-cl {
+    --cl-rule: oklch(from var(--ink) l c h / .14);
+    --cl-mute: oklch(from var(--ink) l c h / .5);
+    --cl-cols: 8;
+    --logo-u: clamp(32px, 3vw, 50px);
+    grid-column: 1/-1;
+    grid-template-columns: repeat(var(--cl-cols), minmax(0, 1fr));
+    border-top: 1px solid var(--cl-rule);
+    clip-path: inset(0 0 0 1px);
+    margin: 9vh 0 0 -1px;
+    padding: 0;
+    list-style: none;
+    display: grid
+}
+
+.f-cl__cell {
+    --cl-lit: var(--cl-bg, var(--ink));
+    --cl-on: oklch(from var(--cl-lit) clamp(0, (.62 - l) * 1000, 1) 0 0);
+    border-bottom: 1px solid var(--cl-rule);
+    border-left: 1px solid var(--cl-rule);
+    position: relative
+}
+
+.f-cl__cell--ask {
+    --cl-lit: var(--red);
+    --cl-on: var(--ink)
+}
+
+.f-cl__in {
+    aspect-ratio: 1/.82;
+    isolation: isolate;
+    color: var(--cl-mute);
+    background: oklch(from var(--cl-lit) l c h / 0);
+    transition: color .45s var(--ease-under), background-color .6s var(--ease-under);
+    -webkit-tap-highlight-color: transparent;
+    grid-template-columns: minmax(0, 1fr);
+    place-items: center;
+    padding: 20px 14px 36px;
+    display: grid;
+    position: relative
+}
+
+.f-cl__mark,
+.f-cl__colour {
+    transition: opacity .25s var(--ease-under);
+    grid-area: 1/1;
+    grid-template-columns: minmax(0, 1fr);
+    place-items: center;
+    display: grid;
+    position: relative
+}
+
+.f-cl__colour {
+    opacity: 0
+}
+
+:is(.f-cl__mark, .f-cl__colour),
+:is(.f-cl__mark, .f-cl__colour) .f-logo {
+    max-width: 100%
+}
+
+.f-cl__colour .f-logo {
+    object-fit: contain
+}
+
+.f-cl__burn {
+    z-index: 0;
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    overflow: hidden
+}
+
+.f-cl__in>:not(.f-cl__burn) {
+    z-index: 1
+}
+
+.f-cl__cap {
+    font: 400 14px/1.2 var(--font);
+    letter-spacing: -.01em;
+    color: var(--ink);
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity .4s var(--ease-under), transform .55s var(--ease-under);
+    justify-content: space-between;
+    gap: 8px;
+    display: flex;
+    position: absolute;
+    bottom: 14px;
+    left: 16px;
+    right: 16px;
+    transform: translateY(6px)
+}
+
+.f-cl__name {
+    text-overflow: ellipsis;
+    min-width: 0;
+    overflow: hidden
+}
+
+a.f-cl__in .f-cl__cap {
+    opacity: 1;
+    color: oklch(from var(--ink) l c h / .55);
+    flex-direction: column;
+    gap: 2px;
+    transform: none
+}
+
+a.f-cl__in :is(.f-cl__mark, .f-cl__colour) {
+    transform: translateY(-6px)
+}
+
+.f-cl__ask {
+    max-width: 6em;
+    font: 400 clamp(17px, 1.45vw, 22px) / 1.15 var(--font);
+    letter-spacing: -.02em;
+    text-align: center;
+    text-wrap: balance
+}
+
+.f-cl__go {
+    align-items: center;
+    gap: 6px;
+    display: inline-flex
+}
+
+.f-cl__go-arr {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    width: 12px;
+    height: 12px;
+    transition: transform .45s var(--appear-ease);
+    flex: none
+}
+
+.f-cl__in:is(:hover, :focus-visible) .f-cl__go-arr {
+    transform: translate(2px, -2px)
+}
+
+.f-cl__arr {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    width: 14px;
+    height: 14px;
+    transition: transform .5s var(--ease-under);
+    position: absolute;
+    top: 14px;
+    right: 14px
+}
+
+.f-cl__in:is(:hover, :active, :focus-visible) .f-cl__cap {
+    opacity: 1;
+    color: var(--ink);
+    transform: none
+}
+
+.f-cl:not([data-burn]) .f-cl__in:is(:hover, :active, :focus-visible) {
+    background: var(--cl-lit)
+}
+
+.f-cl__in:is(.f-cl:not([data-burn]) :is(:hover, :active, :focus-visible), .f-cl[data-burn] [data-lit]),
+.f-cl__in:is(.f-cl:not([data-burn]) :is(:hover, :active, :focus-visible), .f-cl[data-burn] [data-lit]) .f-cl__cap {
+    opacity: 1;
+    color: var(--cl-on);
+    transition-duration: .2s;
+    transform: none
+}
+
+.f-cl__in:is(.f-cl:not([data-burn]) :is(:hover, :active, :focus-visible), .f-cl[data-burn] [data-lit]) .f-logo {
+    --logo-knockout: var(--cl-lit)
+}
+
+.f-cl__in:is(.f-cl:not([data-burn]) :is(:hover, :active, :focus-visible), .f-cl[data-burn] [data-lit]):has(.f-cl__colour) .f-cl__mark {
+    opacity: 0
+}
+
+.f-cl__in:is(.f-cl:not([data-burn]) :is(:hover, :active, :focus-visible), .f-cl[data-burn] [data-lit]) .f-cl__colour {
+    opacity: 1
+}
+
+.f-cl__in:is(:hover, :focus-visible) .f-cl__arr {
+    transform: translate(2px, -2px)
+}
+
+.f-cl__in:focus-visible {
+    outline: 2px solid var(--cl-on, var(--ink));
+    outline-offset: -2px;
+    border-radius: 0
+}
+
+@media (max-width:1099.98px) {
+    .f-cl {
+        --cl-cols: 4
+    }
+    .f-cl__in {
+        aspect-ratio: 1/.95
+    }
+}
+
+@media (max-width:809.98px) {
+    .f-cl {
+        --cl-cols: 3;
+        --logo-u: 29px;
+        margin-top: 6vh
+    }
+    .f-cl__cell:last-child:nth-child(3n+1) {
+        grid-column: 1/-1
+    }
+    .f-cl__cell:last-child:nth-child(3n+2) {
+        grid-column: span 2
+    }
+    .f-cl__cell:last-child:is(:nth-child(3n+1), :nth-child(3n+2)) .f-cl__in {
+        aspect-ratio: auto;
+        height: 100%
+    }
+    .f-cl__in {
+        aspect-ratio: 1/1.05;
+        padding: 12px 8px 30px
+    }
+    .f-cl__cap {
+        white-space: normal;
+        font-size: 12px;
+        bottom: 10px;
+        left: 10px;
+        right: 10px
+    }
+    .f-cl__name {
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        display: -webkit-box
+    }
+    .f-cl__arr {
+        width: 12px;
+        height: 12px;
+        top: 10px;
+        right: 10px
+    }
+}
+
+@media (hover:none) {
+    .f-cl__cap {
+        opacity: 1;
+        color: oklch(from var(--ink) l c h / .55);
+        transform: none
+    }
+    :is(.f-cl__mark, .f-cl__colour) {
+        transform: translateY(-6px)
+    }
+}
+
+@media (prefers-reduced-motion:reduce) {
+    .f-cl__in,
+    .f-cl__cap,
+    .f-cl__arr,
+    .f-cl__go-arr {
+        transition: none
+    }
+}

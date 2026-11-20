@@ -1,0 +1,18 @@
+[data-liquid-head] {
+    --liquid-from: var(--red)
+}
+
+.f-rv__title[data-liquid-head],
+.ab-cta [data-liquid-head] {
+    --liquid-from: var(--liquid-pink)
+}
+
+.f-lede .f-w[data-liquid-head] {
+    will-change: auto
+}
+
+.fx-defs {
+    width: 0;
+    height: 0;
+    position: absolute
+}

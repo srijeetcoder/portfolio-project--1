@@ -1,0 +1,183 @@
+.ew-main {
+    padding: 22svh var(--gutter) 14svh
+}
+
+.ew-back {
+    font: 500 13px/1 var(--font-mono);
+    color: oklch(from var(--ink) l c h / .62);
+    align-items: center;
+    gap: 10px;
+    margin: -15px 0;
+    padding: 15px 0;
+    transition: color .2s;
+    display: inline-flex
+}
+
+.ew-back svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    width: 14px;
+    height: 14px;
+    transition: transform .45s var(--appear-ease)
+}
+
+.ew-back:hover {
+    color: var(--ink)
+}
+
+.ew-back:hover svg {
+    transform: translate(-4px)
+}
+
+.ew-title {
+    font: 300 clamp(4rem, 12vw, 11rem) / .86 var(--font);
+    letter-spacing: -.05em;
+    margin: 4vh 0 9vh
+}
+
+.ew-hero {
+    column-gap: var(--f-gap);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: end;
+    margin: 4vh 0 9vh;
+    display: grid
+}
+
+.ew-hero .ew-title {
+    grid-column: 1/8;
+    margin: 0
+}
+
+.ew-lede {
+    max-width: 46ch;
+    font: 400 17px/1.45 var(--font);
+    color: var(--muted);
+    grid-column: 8/-1;
+    margin: 0 0 .3em
+}
+
+.ew-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 56px 24px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid
+}
+
+.ew-card {
+    color: inherit;
+    gap: 14px;
+    display: grid
+}
+
+.ew-img {
+    aspect-ratio: 16/9;
+    background: oklch(from var(--ink) l c h / .06);
+    border-radius: 14px;
+    display: block;
+    overflow: hidden
+}
+
+.ew-img img {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    transition: transform .9s var(--appear-ease);
+    display: block
+}
+
+.ew-card:hover .ew-img img {
+    transform: scale(1.03)
+}
+
+.ew-cap {
+    letter-spacing: -.01em;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    font-size: 18px;
+    display: flex
+}
+
+.ew-year {
+    font: 500 13px/1 var(--font-mono);
+    color: var(--muted)
+}
+
+.ew-kind {
+    color: var(--muted);
+    margin-top: -8px;
+    font-size: 16px
+}
+
+.ew-card:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 6px;
+    border-radius: 16px
+}
+
+.ew-end {
+    border-top: 1px solid var(--f-rule);
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    margin-top: 12vh;
+    padding-top: 28px;
+    display: flex
+}
+
+.ew-end .ew-back {
+    color: var(--ink)
+}
+
+.ew-up svg {
+    transform: rotate(90deg)
+}
+
+.ew-up:hover svg {
+    transform: rotate(90deg)translate(-4px)
+}
+
+@media (max-width:1099.98px) {
+    .ew-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+    }
+}
+
+@media (max-width:809.98px) {
+    .ew-main {
+        padding-top: 16svh
+    }
+    .ew-hero .ew-title,
+    .ew-lede {
+        grid-column: 1/-1
+    }
+    .ew-lede {
+        margin-top: 3vh;
+        font-size: 15px
+    }
+    .ew-grid {
+        grid-template-columns: 1fr;
+        gap: 40px
+    }
+    .ew-end {
+        margin-top: 9vh
+    }
+}
+
+@media (prefers-reduced-motion:no-preference) {
+    html.motion:not(.motion-revealed) .ew-title {
+        visibility: hidden
+    }
+}
+
+@media (prefers-reduced-motion:reduce) {
+    .ew-img img,
+    .ew-back svg {
+        transition: none
+    }
+}

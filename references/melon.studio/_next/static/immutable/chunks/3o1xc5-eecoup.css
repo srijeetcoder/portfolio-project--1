@@ -1,0 +1,137 @@
+.f-split {
+    padding: 18vh 0 15vh
+}
+
+.f-split__head {
+    flex-direction: column;
+    grid-column: 1/7;
+    align-self: start;
+    gap: 22px;
+    display: flex
+}
+
+.f-split__body {
+    padding-top: calc(var(--f-title-size) * .86 + 23.6px);
+    grid-column: 7/-1
+}
+
+.f-xp__main {
+    column-gap: var(--f-gap);
+    box-sizing: border-box;
+    grid-template-columns: 72px minmax(0, 1fr) auto;
+    align-items: center;
+    min-height: 134px;
+    padding: 31px 0 30px;
+    display: grid
+}
+
+.f-xp__tile {
+    width: 72px;
+    height: 72px;
+    display: block
+}
+
+.f-xp__years {
+    font: 400 15px / 1.4 var(--font);
+    font-variant-numeric: tabular-nums;
+    color: var(--f-fg2);
+    white-space: nowrap;
+    text-align: right
+}
+
+.f-xp__company {
+    font: 400 clamp(1.6rem, 2.2vw, 2.4rem) / 1.05 var(--font);
+    letter-spacing: -.03em;
+    margin-bottom: -.14em;
+    padding-bottom: .14em
+}
+
+.f-xp__role {
+    font: 400 17px / 1.4 var(--font);
+    color: var(--f-fg2);
+    margin: 8px 0 -.14em;
+    padding-bottom: .14em
+}
+
+.f-free {
+    margin-top: 64px
+}
+
+.f-free__label {
+    margin: 0 0 calc(26px - .14em);
+    font: 400 17px / 1.4 var(--font);
+    color: var(--f-fg2);
+    margin: 0 0 calc(26px - round(to-zero, .14em, .015625px));
+    padding-bottom: .14em
+}
+
+.f-free__logos {
+    --logo-u: 36px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 24px 48px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex
+}
+
+.f-free__item {
+    align-items: center;
+    min-height: 40px;
+    display: flex
+}
+
+@media (max-width:1099.98px) {
+    .f-split__head {
+        grid-column: 1/-1
+    }
+    .f-split__body {
+        grid-column: 1/-1;
+        padding-top: 7vh
+    }
+}
+
+@media (max-width:809.98px) {
+    .f-split {
+        padding: 14vh 0 12vh
+    }
+    .f-split__body {
+        padding-top: 5vh
+    }
+    .f-xp__main {
+        grid-template-columns: 52px minmax(0, 1fr);
+        gap: 8px 16px;
+        padding: 22px 0
+    }
+    .f-xp__tile {
+        grid-row: 1/span 2;
+        align-self: start;
+        width: 52px;
+        height: 52px
+    }
+    .f-xp__years {
+        text-align: left;
+        grid-area: 2/2;
+        font-size: 13px
+    }
+    .f-xp__company {
+        font-size: 1.45rem
+    }
+    .f-xp__role {
+        text-wrap: balance;
+        margin-top: 4px;
+        font-size: 15px
+    }
+    .f-free__label {
+        text-wrap: pretty
+    }
+    .f-free {
+        margin-top: 44px
+    }
+    .f-free__logos {
+        --logo-u: 26px;
+        flex-wrap: nowrap;
+        gap: 16px 22px
+    }
+}

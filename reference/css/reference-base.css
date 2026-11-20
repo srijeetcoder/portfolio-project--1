@@ -1,0 +1,425 @@
+:root {
+    --black: #0f0000;
+    --white: #f6efed;
+    --red: red;
+    --red-3: #e5524a;
+    --liquid-pink: #ffb3b3;
+    --ink: #fff;
+    --muted: oklch(from var(--ink) l c h / .55);
+    --rule: oklch(from var(--ink) l c h / .12);
+    --f-bg: var(--black);
+    --f-fg: var(--ink);
+    --f-fg2: var(--muted);
+    --f-rule: oklch(from var(--ink) l c h / .16);
+    --font: "early-sans-variable", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+    --font-display: "lekick-regular", "early-sans-variable", ui-sans-serif, sans-serif;
+    --f-mono: 500 13px/1.35 var(--font-mono);
+    --f-title-size: clamp(3.25rem, 7.4vw, 8.75rem);
+    --gutter: 40px;
+    --f-gap: 24px;
+    --st-gap: clamp(72px, 9.5vw, 144px);
+    --atf-hero: max(83svh, calc(.8vh + 32.4vw + 64px));
+    --col-w: min(52vw, 92svh);
+    --col-gap: 3.5rem;
+    --cap-gap: 24px;
+    --appear-ease: cubic-bezier(.11, .06, .18, 1);
+    --ease-reveal: cubic-bezier(.18, .66, .18, 1);
+    --ease-under: cubic-bezier(.18, .83, .27, 1)
+}
+
+@supports (color:lab(0% 0 0)) {
+    :root {
+        --black: lab(.966936% 4.29029 1.5379);
+        --white: lab(94.9561% 2.16478 1.83953);
+        --red: lab(54.2955% 80.8113 69.8784);
+        --red-3: lab(55.978% 57.5701 37.0703);
+        --liquid-pink: lab(80.4043% 28.4933 11.727);
+        --ink: lab(100% 0 0)
+    }
+}
+
+@media (max-width:809.98px) {
+    :root {
+        --gutter: 20px;
+        --atf-hero: max(62svh, calc(.8vh + 58px + 110vw / 3.08681 + 16vh + 200px));
+        --f-gap: 16px;
+        --st-gap: 72px;
+        --col-w: calc(100vw - 48px);
+        --col-gap: 5.5rem;
+        --cap-gap: 14px
+    }
+}
+
+* {
+    box-sizing: border-box
+}
+
+html {
+    background: var(--black);
+    scrollbar-width: none
+}
+
+html::-webkit-scrollbar {
+    display: none
+}
+
+body {
+    background: var(--black);
+    color: var(--ink);
+    font: 400 18px/1.45 var(--font);
+    -webkit-font-smoothing: antialiased;
+    margin: 0
+}
+
+a {
+    color: inherit;
+    text-decoration: none
+}
+
+a:focus-visible,
+button:focus-visible {
+    outline: 2px solid var(--f-fg);
+    outline-offset: 4px;
+    border-radius: 4px
+}
+
+p,
+ul,
+h1,
+h2,
+h3 {
+    margin: 0
+}
+
+ul {
+    padding: 0;
+    list-style: none
+}
+
+sup {
+    letter-spacing: .04em;
+    vertical-align: 0;
+    opacity: .6;
+    margin-left: 4px;
+    font-size: 10px;
+    position: relative;
+    top: -.85em
+}
+
+.skip:focus-visible {
+    z-index: 500;
+    top: 84px;
+    left: var(--gutter);
+    clip: auto;
+    background: var(--black);
+    width: auto;
+    height: auto;
+    color: var(--ink);
+    font: 500 13px/1 var(--font-mono);
+    box-shadow: 0 0 0 1px oklch(from var(--ink) l c h / .24);
+    outline: 2px solid var(--red);
+    outline-offset: 3px;
+    border-radius: 999px;
+    padding: 14px 20px;
+    position: fixed;
+    overflow: visible
+}
+
+@media (max-width:809.98px) {
+    .skip:focus-visible {
+        top: 62px
+    }
+}
+
+main:focus {
+    outline: none
+}
+
+.sr-only {
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    width: 1px;
+    height: 1px;
+    position: absolute;
+    overflow: hidden
+}
+
+[data-tone] {
+    background: var(--f-bg);
+    color: var(--f-fg)
+}
+
+[data-tone=white] {
+    --f-bg: var(--white);
+    --f-fg: var(--black);
+    --f-fg2: oklch(from var(--black) l c h / .62);
+    --f-rule: oklch(from var(--black) l c h / .16)
+}
+
+.f-grid {
+    column-gap: var(--f-gap);
+    padding: 0 var(--gutter);
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    display: grid
+}
+
+@media (max-width:809.98px) {
+    .f-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr))
+    }
+}
+
+.f-sec {
+    position: relative
+}
+
+.f-rule {
+    background: var(--f-rule);
+    transform-origin: 0;
+    height: 1px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0
+}
+
+.f-row {
+    position: relative
+}
+
+.f-row--end {
+    height: 1px
+}
+
+.f-list {
+    margin: 0;
+    padding: 0;
+    list-style: none
+}
+
+.f-title {
+    font: 300 var(--f-title-size) / .86 var(--font);
+    letter-spacing: -.05em
+}
+
+@media (max-width:809.98px) {
+    .f-title {
+        font-size: clamp(3rem, 15vw, 4.5rem)
+    }
+}
+
+.f-logo {
+    --logo-knockout: var(--f-bg);
+    width: calc(var(--w, 3) * 1em);
+    height: calc(var(--h, .6) * 1em);
+    font-size: var(--logo-u, 44px);
+    vertical-align: middle;
+    flex: none;
+    line-height: 0;
+    display: inline-block
+}
+
+.f-logo svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible
+}
+
+.f-logo svg [fill^=\#] {
+    fill: currentColor
+}
+
+.f-logo--mask {
+    -webkit-mask: var(--mask) center / contain no-repeat;
+    mask: var(--mask) center / contain no-repeat;
+    background: currentColor
+}
+
+.f-logo--word {
+    width: auto;
+    height: auto;
+    font: 600 calc(var(--logo-u, 44px) * .5) / 1 var(--font);
+    letter-spacing: -.035em;
+    white-space: nowrap
+}
+
+.f-u {
+    position: relative
+}
+
+.f-u:after {
+    content: "";
+    left: 0;
+    right: 0;
+    bottom: var(--u-y, -2px);
+    height: var(--u-h, 1px);
+    pointer-events: none;
+    transform-origin: 100%;
+    transition: transform .7s var(--ease-under);
+    background: currentColor;
+    position: absolute;
+    transform: scaleX(0)
+}
+
+.f-u:focus-visible:after {
+    transform-origin: 0;
+    transform: scaleX(1)
+}
+
+@media (hover:hover) {
+    html:not(:has(#hero)) .f-u:hover:after {
+        transform-origin: 0;
+        transform: scaleX(1)
+    }
+    html:not(:has(#hero)) .f-showall:hover:after {
+        transform: scaleX(1)
+    }
+    html:not(:has(#hero)) .f-showall:hover .f-roll__t {
+        transform: translateY(-100%)
+    }
+    html:not(:has(#hero)) .f-showall:hover .f-showall__arr {
+        transform: translate(150%)
+    }
+    html:not(:has(#hero)) .f-showall:hover .f-showall__arr--b {
+        transform: none
+    }
+}
+
+.f-showall {
+    font: 500 13px/1 var(--font-mono);
+    color: var(--f-fg);
+    white-space: nowrap;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0 7px;
+    display: inline-flex;
+    position: relative
+}
+
+.f-showall:before,
+.f-showall:after {
+    content: "";
+    background: currentColor;
+    height: 1px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0
+}
+
+.f-showall:before {
+    opacity: .3
+}
+
+.f-showall:after {
+    transform-origin: 0;
+    transition: transform .55s var(--appear-ease);
+    transform: scaleX(0)
+}
+
+.f-showall:focus-visible {
+    outline-offset: 6px;
+    border-radius: 2px;
+    outline: 2px solid
+}
+
+.f-showall:focus-visible:after {
+    transform: scaleX(1)
+}
+
+.f-roll {
+    display: block;
+    position: relative;
+    overflow: clip
+}
+
+.f-roll__in {
+    display: block;
+    position: relative
+}
+
+.f-roll__t {
+    transition: transform .3s;
+    display: block
+}
+
+.f-roll__t--b {
+    position: absolute;
+    top: 100%;
+    left: 0
+}
+
+.f-showall:focus-visible .f-roll__t {
+    transform: translateY(-100%)
+}
+
+.f-showall__arrs {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    display: block;
+    position: relative;
+    overflow: clip
+}
+
+.f-showall__arr {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.4px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    width: 14px;
+    height: 14px;
+    transition: transform .3s;
+    position: absolute;
+    inset: 0
+}
+
+.f-showall__arr--b {
+    transform: translate(-150%)
+}
+
+.f-showall:focus-visible .f-showall__arr {
+    transform: translate(150%)
+}
+
+.f-showall:focus-visible .f-showall__arr--b {
+    transform: none
+}
+
+@media (max-width:809.98px) {
+    .f-showall {
+        margin: -10px 0 -12px;
+        padding: 18px 0 19px;
+        font-size: 12px
+    }
+    .f-showall:before,
+    .f-showall:after {
+        bottom: 12px
+    }
+}
+
+@media (prefers-reduced-motion:reduce) {
+    .f-u:after,
+    .f-showall:after,
+    .f-roll__t,
+    .f-showall__arr {
+        transition: none
+    }
+}
+
+.mask {
+    display: block;
+    overflow: hidden
+}
+
+.up {
+    display: block
+}
+
+.pp-lmask {
+    margin-bottom: -.14em;
+    padding-bottom: .14em
+}

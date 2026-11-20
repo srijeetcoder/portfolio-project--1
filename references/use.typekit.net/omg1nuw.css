@@ -1,0 +1,52 @@
+/*
+ * The Typekit service used to deliver this font or fonts for use on websites
+ * is provided by Adobe and is subject to these Terms of Use
+ * http://www.adobe.com/products/eulas/tou_typekit. For font license
+ * information, see the list below.
+ *
+ * early-sans-variable:
+ *   - http://typekit.com/eulas/00000000000000007755b0da
+ *   - http://typekit.com/eulas/00000000000000007755b0db
+ * lekick-regular:
+ *   - http://typekit.com/eulas/0000000000000000774a1c09
+ *
+ * © 2009-2026 Adobe Systems Incorporated. All Rights Reserved.
+ */
+
+/*{"last_published":"2026-10-02 20:48:24 UTC"}*/
+
+@import url("https://p.typekit.net/p.css?s=1&k=omg1nuw&ht=tk&f=50377.57391.57392&a=161702356&app=typekit&e=css");
+@font-face {
+    font-family: "lekick-regular";
+    src: url("https://use.typekit.net/af/ea70a2/0000000000000000774a1c09/31/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff2"), url("https://use.typekit.net/af/ea70a2/0000000000000000774a1c09/31/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff"), url("https://use.typekit.net/af/ea70a2/0000000000000000774a1c09/31/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("opentype");
+    font-display: auto;
+    font-style: normal;
+    font-weight: 400;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "early-sans-variable";
+    src: url("https://use.typekit.net/af/b563d2/00000000000000007755b0da/31/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n3&v=3") format("woff2"), url("https://use.typekit.net/af/b563d2/00000000000000007755b0da/31/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n3&v=3") format("woff"), url("https://use.typekit.net/af/b563d2/00000000000000007755b0da/31/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n3&v=3") format("opentype");
+    font-display: auto;
+    font-style: normal;
+    font-weight: 300 900;
+    font-stretch: normal;
+}
+
+@font-face {
+    font-family: "early-sans-variable";
+    src: url("https://use.typekit.net/af/af06b8/00000000000000007755b0db/31/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i3&v=3") format("woff2"), url("https://use.typekit.net/af/af06b8/00000000000000007755b0db/31/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i3&v=3") format("woff"), url("https://use.typekit.net/af/af06b8/00000000000000007755b0db/31/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=i3&v=3") format("opentype");
+    font-display: auto;
+    font-style: italic;
+    font-weight: 300 900;
+    font-stretch: normal;
+}
+
+.tk-lekick-regular {
+    font-family: "lekick-regular", sans-serif;
+}
+
+.tk-early-sans-variable {
+    font-family: "early-sans-variable", sans-serif;
+}

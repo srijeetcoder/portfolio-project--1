@@ -1,0 +1,232 @@
+.pa .pj {
+    --par-pad: 0%
+}
+
+.pa .pj-wrap {
+    padding: 0
+}
+
+.pa :is(.pj-sheet, .pj-sheet__b, .pj-teaser__card) {
+    --muted: color-mix(in srgb, var(--pj-fg) 55%, transparent);
+    --rule: color-mix(in srgb, var(--pj-fg) 16%, transparent);
+    --fg3: color-mix(in srgb, var(--pj-fg) 62%, transparent)
+}
+
+.pa .pj-sheet__b {
+    padding-bottom: 40px
+}
+
+@supports (animation-timeline:scroll()) {
+    .pa .pj {
+        --pa-a-bg: var(--pj-bg);
+        --pa-a-fg: var(--pj-fg);
+        --pa-b-bg: var(--pj-b-bg);
+        --pa-b-fg: var(--pj-b-fg);
+        --pa-at: 200vh;
+        --pa-band: 60vh
+    }
+    .pa :is(.ov-bar, .pj-wrap) {
+        animation: step-end both pa-theme;
+        animation-timeline: scroll(root);
+        animation-range: 0 min(calc(var(--pa-at) + var(--pa-band) / 2), calc(100% - var(--pa-band) / 2))
+    }
+    .pa .ov-close {
+        animation: none
+    }
+}
+
+@keyframes pa-theme {
+    0% {
+        --pj-bg: var(--pa-a-bg);
+        --pj-fg: var(--pa-a-fg);
+        --pj-b-bg: var(--pa-a-bg);
+        --pj-b-fg: var(--pa-a-fg)
+    }
+    to {
+        --pj-bg: var(--pa-b-bg);
+        --pj-fg: var(--pa-b-fg);
+        --pj-b-bg: var(--pa-b-bg);
+        --pj-b-fg: var(--pa-b-fg)
+    }
+}
+
+html.motion #overlay :is(.ov-bar, .pj-wrap) {
+    animation: none
+}
+
+.pa .pj__title .pp-lmask {
+    margin-bottom: -.22em;
+    padding-bottom: .22em
+}
+
+.pa .pj-st__title .pp-lmask {
+    margin-bottom: -.18em;
+    padding-bottom: .18em
+}
+
+.pa .pj-st__statement .pp-lmask {
+    margin-bottom: -.2em;
+    padding-bottom: .2em
+}
+
+.pa .pj__info {
+    padding-bottom: 64px
+}
+
+.pa .pj__title {
+    text-wrap: balance
+}
+
+.pa .pj__kind,
+.pa .pj__link {
+    line-height: 1.55
+}
+
+.pa .pj__meta>div {
+    grid-template-columns: 7em minmax(0, 1fr)
+}
+
+.pp-copy {
+    font: inherit;
+    color: inherit;
+    background: linear-gradient(var(--red), var(--red)) left 100% / 0% 1px no-repeat;
+    cursor: pointer;
+    transition: background-size .45s var(--appear-ease);
+    border: 0;
+    padding: 0 0 2px;
+    display: inline-block
+}
+
+.pp-copy:hover {
+    background-size: 100% 1px
+}
+
+.pa .pj-sheet :is(.pj__fig--hero img, .pj__par) {
+    will-change: transform
+}
+
+.pa .pj-story {
+    padding-top: var(--st-gap)
+}
+
+.ps--text,
+.ps--list {
+    padding-top: 28px;
+    position: relative
+}
+
+.ps__rule {
+    background: var(--rule);
+    height: 1px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0
+}
+
+.ps--intro {
+    padding-top: 0
+}
+
+.ps--intro .pj-st__body {
+    margin-top: 0
+}
+
+.ps__rows {
+    border-top: 1px solid var(--rule);
+    margin-top: 1.6em
+}
+
+.ps__rows>li {
+    border-bottom: 1px solid var(--rule);
+    padding: 16px 0;
+    font-size: 18px;
+    line-height: 1.4
+}
+
+.pj-st__body>.pj-st__list,
+.pj-st__body>:is(.ps__rows, .pj-st__list)+.pj-st__p {
+    margin-top: 1.6em
+}
+
+.pa .ps__list--n>div {
+    grid-template-columns: 3em minmax(0, 1fr)
+}
+
+.pa .ps__list--n dt {
+    font: var(--f-mono);
+    color: var(--fg3);
+    padding-top: .25em
+}
+
+.ps__list--loop dd {
+    grid-template-columns: 6.5em 7em minmax(0, 1fr);
+    align-items: baseline;
+    column-gap: 16px;
+    display: grid
+}
+
+.ps__who {
+    font: var(--f-mono);
+    color: var(--fg3);
+    padding-top: .2em;
+    display: block
+}
+
+.ps__who--me {
+    color: var(--red)
+}
+
+.ps__t {
+    color: var(--muted)
+}
+
+.ps__cap--list {
+    grid-column: 5/span 6
+}
+
+.ps__fig--code {
+    margin: 1.8em 0
+}
+
+.ps__code {
+    font: 400 13.5px/1.7 var(--font-mono);
+    white-space: pre;
+    tab-size: 2;
+    color: var(--pj-fg);
+    margin: 0;
+    padding: 24px 28px 26px;
+    overflow-x: auto
+}
+
+@media (max-width:809.98px) {
+    .pa .pj {
+        --pa-band: 85vh
+    }
+    .pa .pj__info {
+        padding-bottom: 40px
+    }
+    .pa .pj__meta {
+        font-size: 17px
+    }
+    .pa .pj__meta>div {
+        grid-template-columns: 6em minmax(0, 1fr)
+    }
+    .ps__rows>li {
+        font-size: 17px
+    }
+    .pa .ps__list--n>div {
+        grid-template-columns: 2.6em minmax(0, 1fr)
+    }
+    .ps__list--loop dd {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 4px
+    }
+    .ps__cap--list {
+        grid-column: 1/-1
+    }
+    .ps__code {
+        padding: 18px 16px 20px;
+        font-size: 12.5px
+    }
+}

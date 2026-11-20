@@ -1,0 +1,188 @@
+.ts-w {
+    white-space: nowrap
+}
+
+.ts-locked .ts-c {
+    width: var(--ts-w);
+    white-space: pre;
+    justify-content: center;
+    line-height: 0;
+    display: inline-flex
+}
+
+.ts-c.is-alt {
+    font-family: var(--font-display);
+    font-synthesis: none;
+    font-weight: 400;
+    font-size: calc(1em * var(--ts-fit, 1))
+}
+
+.ts-measure .ts-c,
+.ts-measure-alt .ts-c {
+    width: auto;
+    font-size: inherit;
+    display: inline
+}
+
+.ts-measure .ts-c {
+    font-family: inherit;
+    font-weight: inherit
+}
+
+.ts-measure-alt .ts-c {
+    font-family: var(--font-display);
+    font-synthesis: none;
+    font-weight: 400
+}
+
+:root {
+    --f-inv: 0
+}
+
+html.motion-live .f-page {
+    z-index: -1;
+    background: var(--f-bg);
+    pointer-events: none;
+    visibility: hidden;
+    position: fixed;
+    inset: 0
+}
+
+html:not(.motion-live) .f-page {
+    display: none
+}
+
+html.motion-live body:has(>.f-page) [data-tone] {
+    --f-bg: inherit;
+    --f-fg: inherit;
+    --f-fg2: inherit;
+    --f-rule: inherit;
+    background: 0 0
+}
+
+html.motion-live body:has(>.f-page) {
+    background: 0 0
+}
+
+html.motion:not(.motion-revealed):has(#hero) :is(.hero__logo-blend, .hero__silhouette, .topbar__logo img, .f-nav__in, .atf-what) {
+    visibility: hidden
+}
+
+.hero[data-wm=split] .hero__wordmark {
+    background: 0 0;
+    position: relative;
+    -webkit-mask: none;
+    mask: none
+}
+
+.hero[data-wm=split] .hero__silhouette {
+    background: 0 0;
+    -webkit-mask: none;
+    mask: none
+}
+
+.f-wm__clip {
+    pointer-events: none;
+    position: absolute;
+    inset: 0
+}
+
+.f-wm__l,
+.f-sil__l {
+    -webkit-mask: var(--m) center / 100% 100% no-repeat;
+    mask: var(--m) center / 100% 100% no-repeat;
+    will-change: transform;
+    position: absolute;
+    inset: 0
+}
+
+.f-wm__l {
+    background: radial-gradient(56% 156% at 47.1% 1.9% in srgb, var(--wm-stop0) 0%, var(--wm-stop1) 100%)
+}
+
+.f-sil__l {
+    background: linear-gradient(in srgb 180deg, #8f8f8f00 var(--sil-start), var(--sil-color) 100%)
+}
+
+@supports (color:lab(0% 0 0)) {
+    .f-sil__l {
+        background: linear-gradient(in srgb 180deg, lab(59.4% 0 0/0) var(--sil-start), var(--sil-color) 100%)
+    }
+}
+
+html.motion:has(#hero) .topbar:not(.f-nav-done) :is(.topbar__logo, .topbar__nav .f-u) {
+    overflow: clip
+}
+
+html.motion .atf-what {
+    transform: translate3d(0, var(--hero-y), 0)
+}
+
+.f-lmask {
+    margin-bottom: -.14em;
+    padding-bottom: .14em;
+    overflow: clip
+}
+
+.atf-lmask {
+    margin-bottom: -.12em;
+    padding-bottom: .12em
+}
+
+.f-contact__mail .f-lmask {
+    margin-bottom: -.42em;
+    padding-bottom: .42em
+}
+
+.f-m {
+    margin-bottom: -.14em;
+    padding-bottom: .14em;
+    display: block;
+    overflow: clip
+}
+
+.f-m__in {
+    display: block
+}
+
+.f-ch {
+    will-change: transform
+}
+
+.f-u.is-u:after {
+    transform-origin: 0;
+    transform: scaleX(1)
+}
+
+.f-foot__link.is-u .f-foot__arr {
+    opacity: 1;
+    transform: translate(2px, -2px)
+}
+
+.f-showall.is-hover:after {
+    transform: scaleX(1)
+}
+
+.f-showall.is-hover .f-roll__t {
+    transform: translateY(-100%)
+}
+
+.f-showall.is-hover .f-showall__arr {
+    transform: translate(150%)
+}
+
+.f-showall.is-hover .f-showall__arr--b {
+    transform: none
+}
+
+@media (max-width:809.98px) {
+    html.motion:has(#hero) .topbar:not(.f-nav-done) .topbar__nav .f-u {
+        --u-y: .22em;
+        margin: -.7em 0 -.45em;
+        padding: .7em 0 .45em
+    }
+    html.motion:has(#hero) .topbar:not(.f-nav-done) .topbar__logo {
+        margin: 0;
+        padding: 0
+    }
+}

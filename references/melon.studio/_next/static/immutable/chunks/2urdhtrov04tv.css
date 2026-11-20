@@ -1,0 +1,219 @@
+.topbar {
+    top: 22px;
+    left: var(--gutter);
+    right: var(--gutter);
+    z-index: 10;
+    pointer-events: none;
+    justify-content: space-between;
+    align-items: flex-start;
+    display: flex;
+    position: fixed
+}
+
+.topbar>* {
+    pointer-events: auto
+}
+
+.topbar.is-blend {
+    mix-blend-mode: difference
+}
+
+@supports (animation-timeline:scroll()) {
+    .topbar.is-blend {
+        mix-blend-mode: normal;
+        animation: linear forwards topbar-blend;
+        animation-timeline: scroll(root);
+        animation-range: calc(var(--atf-hero) - 96px) 100%
+    }
+}
+
+@supports not (animation-timeline:scroll()) {
+    html.motion:not(.motion-live) .topbar.is-blend {
+        mix-blend-mode: normal
+    }
+}
+
+@keyframes topbar-blend {
+    0%,
+    to {
+        mix-blend-mode: difference
+    }
+}
+
+html.motion-live .topbar.is-blend {
+    mix-blend-mode: difference;
+    animation: none
+}
+
+html.f-solid .topbar.is-blend {
+    mix-blend-mode: normal;
+    color: var(--f-fg)
+}
+
+html.f-solid .topbar.is-blend .topbar__logo img {
+    filter: invert(var(--f-inv))
+}
+
+.topbar.is-blend:before {
+    content: "";
+    z-index: -1;
+    pointer-events: none;
+    inset: calc(-1 * var(--tb-top, 22px)) calc(-1 * var(--gutter)) calc(-1 * var(--tb-tail, 40px));
+    background: linear-gradient(to bottom, var(--f-bg) calc(100% - var(--tb-fade, 28px)), color-mix(in srgb, var(--f-bg) 0%, transparent));
+    opacity: 0;
+    transition: opacity .3s;
+    position: absolute
+}
+
+html.f-solid .topbar.is-blend:before {
+    opacity: 1
+}
+
+.topbar__logo {
+    line-height: 0;
+    display: block
+}
+
+.topbar__logo img {
+    width: 110px;
+    height: 50px;
+    display: block
+}
+
+.topbar__nav {
+    letter-spacing: -.01em;
+    gap: 50px;
+    padding-top: 13px;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1;
+    display: flex
+}
+
+.topbar__nav a {
+    transition: opacity .2s;
+    position: relative
+}
+
+.topbar__nav .f-u {
+    --u-y: .22em;
+    margin: -.7em 0 -.45em;
+    padding: .7em 0 .45em;
+    display: block
+}
+
+.f-nav__in {
+    display: inline-block
+}
+
+.topbar__nav .f-u[aria-current=page]:after {
+    transform-origin: 0;
+    transform: scaleX(1)
+}
+
+sup.count {
+    font-family: var(--font-mono);
+    letter-spacing: 0;
+    font-weight: 500
+}
+
+.ew-bar {
+    position: absolute
+}
+
+.ew-bar .topbar__nav a:not(.f-u):hover {
+    opacity: .7
+}
+
+.ew-bar .topbar__nav a[aria-current]:not(.f-u):after {
+    content: "";
+    pointer-events: none;
+    background: currentColor;
+    height: 1px;
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0
+}
+
+.ew-bar.is-paper {
+    --f-fg: var(--black);
+    color: var(--black)
+}
+
+.ew-bar.is-paper .topbar__logo img {
+    filter: invert()
+}
+
+.bl-bar {
+    color: var(--black);
+    position: absolute
+}
+
+.bl-bar .topbar__logo img {
+    filter: invert()
+}
+
+.bl-u:after {
+    content: "";
+    pointer-events: none;
+    transform-origin: 100%;
+    height: 1px;
+    transition: transform .7s var(--ease-under);
+    background: currentColor;
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    right: 0;
+    transform: scaleX(0)
+}
+
+.bl-u:hover:after,
+.bl-u:focus-visible:after,
+.bl-u[aria-current=page]:after {
+    transform-origin: 0;
+    transform: scaleX(1)
+}
+
+.bl-u:focus-visible {
+    outline: none
+}
+
+@media (max-width:809.98px) {
+    .topbar {
+        --tb-top: 16px;
+        --tb-tail: 34px;
+        --tb-fade: 24px;
+        top: 16px
+    }
+    .topbar__logo {
+        margin: -5px -8px -4px;
+        padding: 5px 8px 4px
+    }
+    .topbar__logo img {
+        width: 77px;
+        height: 35px
+    }
+    .topbar__nav {
+        gap: 18px;
+        padding-top: 10px;
+        font-size: 15px
+    }
+    .topbar__nav .f-u {
+        --u-y: calc(15px - .23em);
+        margin: -14px -9px -15px;
+        padding: 14px 9px 15px
+    }
+    .ew-bar .topbar__nav a[aria-current]:not(.f-u):after {
+        bottom: -5px
+    }
+    sup.count {
+        display: none
+    }
+}
+
+@media (prefers-reduced-motion:reduce) {
+    .bl-u:after {
+        transition: none
+    }
+}

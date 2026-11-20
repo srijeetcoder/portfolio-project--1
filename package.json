@@ -1,0 +1,36 @@
+{
+  "name": "brother-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "assets:setup": "node scripts/setup-assets.mjs",
+    "media:sync": "node scripts/sync-media.mjs",
+    "predev": "npm run media:sync",
+    "dev": "vite --host 127.0.0.1",
+    "build": "npm run media:sync && tsc -b && vite build && node scripts/copy-videos.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "@paper-design/shaders": "^0.0.82",
+    "lucide-react": "^0.553.0",
+    "motion": "^12.23.24",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@fontsource-variable/geist-mono": "^5.3.0",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/serve-static": "^2.2.0",
+    "@vitejs/plugin-react": "^5.1.0",
+    "ffmpeg-static": "^5.2.0",
+    "playwright": "^1.56.1",
+    "serve-static": "^2.2.1",
+    "sharp": "^0.35.5",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.2"
+  }
+}

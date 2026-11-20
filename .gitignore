@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.qa/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+
+# Original owner footage stays local; generated compressed posters are tracked.
+/videos/**
+!/videos/**/
+!/videos/**/.gitkeep

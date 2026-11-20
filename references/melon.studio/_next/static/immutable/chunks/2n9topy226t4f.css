@@ -1,0 +1,161 @@
+.overlay {
+    z-index: 50;
+    background: oklch(from var(--black) l c h / var(--ov-a, 1));
+    --pj-pill-h: 40px;
+    position: fixed;
+    inset: 0
+}
+
+@media (max-width:809.98px) {
+    .overlay {
+        --pj-pill-h: 44px
+    }
+}
+
+.overlay[hidden] {
+    display: none
+}
+
+.ov-scroll {
+    z-index: 1;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+    height: 100%;
+    position: relative;
+    overflow-y: auto
+}
+
+.ov-scroll::-webkit-scrollbar {
+    display: none
+}
+
+.ov-scroll.motion-stopped {
+    overflow: hidden
+}
+
+.ov-content {
+    min-height: 100%;
+    position: relative
+}
+
+.overlay .ov-bar {
+    left: var(--pj-bar-inset, var(--pj-inset));
+    right: var(--pj-bar-inset, var(--pj-inset));
+    transition: left var(--pj-bar-t, 0s) cubic-bezier(.45, 0, .55, 1), right var(--pj-bar-t, 0s) cubic-bezier(.45, 0, .55, 1)
+}
+
+.overlay .pj {
+    z-index: 1;
+    position: relative
+}
+
+.pj--leaving {
+    z-index: 0;
+    pointer-events: none;
+    width: 100%;
+    position: fixed;
+    left: 0
+}
+
+.ov-pull {
+    z-index: 3;
+    top: calc((var(--pj-bar) - var(--pj-pill-h)) / 2);
+    height: var(--pj-pill-h);
+    background: var(--pj-fg);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pj-bg) 18%, transparent);
+    color: var(--pj-bg);
+    font: 400 16px/1 var(--font);
+    letter-spacing: -.01em;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    cursor: pointer;
+    border: 0;
+    border-radius: 999px;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 0 18px 0 10px;
+    display: inline-flex;
+    position: absolute;
+    left: 50%;
+    translate: -50%
+}
+
+.ov-pull svg {
+    width: 22px;
+    height: 22px;
+    rotate: -90deg
+}
+
+.ov-pull circle {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2px
+}
+
+.ov-pull__track {
+    opacity: .2
+}
+
+.ov-pull__ring {
+    stroke-dasharray: 62.83;
+    stroke-dashoffset: 62.83px;
+    stroke-linecap: round
+}
+
+html.pj-open :is(.atf-what-box, .f-work__head, #chapters) {
+    opacity: 0;
+    visibility: hidden
+}
+
+html.po-open,
+html.po-open body {
+    overflow: hidden
+}
+
+html.pj-flying canvas.gl {
+    z-index: 60
+}
+
+html.pj-flying .overlay .pj__fig--hero>:is(img, video),
+.overlay .pj__fig--hero.po-wait img {
+    visibility: hidden
+}
+
+.po-fly {
+    z-index: 60;
+    pointer-events: none;
+    will-change: transform, left, top, width, height;
+    margin: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow: hidden
+}
+
+.po-fly>* {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    display: block
+}
+
+.po-fly--title {
+    font-family: var(--font);
+    text-wrap: balance;
+    font-weight: 400;
+    overflow: visible
+}
+
+.overlay .pj__fig--hero>video {
+    object-fit: cover;
+    pointer-events: none;
+    width: 100%;
+    height: 100%;
+    opacity: var(--pj-vid, 1);
+    display: block;
+    position: absolute;
+    inset: 0
+}

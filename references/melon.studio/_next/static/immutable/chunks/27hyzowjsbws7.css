@@ -1,0 +1,340 @@
+.ct-chip__fx,
+.ck__fx,
+.dc-btn__fx {
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    overflow: hidden
+}
+
+.fx-px {
+    width: 100%;
+    height: 100%;
+    display: block;
+    position: absolute;
+    inset: 0
+}
+
+.ct-chip {
+    --fx-fill: var(--ink);
+    --fx-on: var(--black);
+    --fx-off: var(--dc-fg3)
+}
+
+.ct-chip:hover {
+    --fx-off: var(--ink)
+}
+
+.ct-chip__in {
+    isolation: isolate;
+    position: relative
+}
+
+.ct-submit {
+    --fx-fill: var(--red);
+    --fx-on: var(--ink);
+    --fx-off: var(--black)
+}
+
+.ab-cta__go {
+    isolation: isolate;
+    --fx-fill: var(--ink);
+    --fx-on: var(--black);
+    --fx-off: var(--ink)
+}
+
+.ck__btn {
+    isolation: isolate;
+    --fx-fill: var(--ck-ink);
+    --fx-on: var(--ck-bg);
+    --fx-off: var(--ck-ink);
+    overflow: hidden
+}
+
+.ck__btn--fill {
+    --fx-fill: var(--red);
+    --fx-on: var(--ck-bg);
+    --fx-off: var(--ck-bg)
+}
+
+.ck__btn[aria-pressed=true] {
+    --fx-off: var(--ck-bg)
+}
+
+.dc-btn {
+    isolation: isolate;
+    --fx-fill: var(--ink);
+    --fx-on: var(--black);
+    --fx-off: var(--ink);
+    position: relative;
+    overflow: hidden
+}
+
+:root[data-fx] :is(.ct-chip, [data-fx-btn]) {
+    -webkit-tap-highlight-color: transparent
+}
+
+:root[data-fx] :is(.ct-submit__fill, .ab-cta__fill) {
+    background: 0 0;
+    transition: none;
+    transform: none
+}
+
+:root[data-fx] .ck__btn:not(.ck__btn--fill, [aria-pressed=true]):hover,
+:root[data-fx] .dc-btn[data-fx-btn]:hover {
+    background-color: #0000
+}
+
+:root[data-fx] .ck__btn--fill:hover {
+    background-color: var(--ck-ink)
+}
+
+:root .ct-chip[data-fx-run] input+.ct-chip__in {
+    border-color: var(--ink);
+    transition: border-color .4s var(--ease-under);
+    background-color: #0000
+}
+
+:root .ct-chip[data-fx-lit] input+.ct-chip__in {
+    border-color: var(--fx-fill);
+    color: var(--fx-on)
+}
+
+[data-fx-btn][data-fx-run] {
+    transition: none
+}
+
+[data-fx-btn][data-fx-run] [data-fx-t] {
+    color: #0000;
+    background: var(--fx-cover);
+    -webkit-background-clip: text;
+    background-clip: text
+}
+
+[data-fx-btn][data-fx-run]>svg {
+    color: var(--fx-off)
+}
+
+[data-fx-btn][data-fx-run][data-fx-arr]>svg {
+    color: var(--fx-on)
+}
+
+.f-ld {
+    z-index: 200;
+    height: 100dvh;
+    color: var(--ink);
+    pointer-events: auto;
+    font-size: 16px;
+    position: fixed;
+    inset: 0
+}
+
+html.f-loading .f-ld {
+    display: block
+}
+
+.f-ld__sheet {
+    background: var(--red);
+    position: absolute;
+    inset: 0
+}
+
+.f-ld__panel {
+    background: var(--black);
+    position: absolute;
+    inset: 0
+}
+
+.f-ld__content {
+    position: absolute;
+    inset: 0
+}
+
+.f-ld__mark {
+    width: 154px;
+    height: 70px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+}
+
+.f-ld__mark-ghost,
+.f-ld__mark-fill {
+    background: var(--ink);
+    position: absolute;
+    inset: 0;
+    -webkit-mask: url(/brand/Logo-melon.svg) 50%/contain no-repeat;
+    mask: url(/brand/Logo-melon.svg) 50%/contain no-repeat
+}
+
+.f-ld__mark-ghost {
+    opacity: .2
+}
+
+.f-ld__mark-fill {
+    clip-path: inset(0% 100% 0% 0%)
+}
+
+.f-ld__labels {
+    left: var(--gutter);
+    font: 500 12px/1 var(--font-mono);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    display: grid;
+    position: absolute;
+    bottom: 45px
+}
+
+.f-ld__label {
+    white-space: nowrap;
+    visibility: hidden;
+    grid-area: 1/1;
+    margin-bottom: -.25em;
+    padding-bottom: .25em
+}
+
+.f-ld__mask {
+    margin-bottom: -.25em;
+    padding-bottom: .25em
+}
+
+.f-ld__count {
+    right: var(--gutter);
+    font: 400 clamp(72px, 12.5vw, 216px) / .78 var(--font-mono);
+    letter-spacing: -.06em;
+    font-variant-numeric: tabular-nums;
+    align-items: flex-start;
+    margin: 0;
+    display: flex;
+    position: absolute;
+    bottom: 40px
+}
+
+.f-ld__pct {
+    letter-spacing: 0;
+    opacity: .55;
+    margin: .08em 0 0 .22em;
+    font-size: .26em;
+    line-height: 1
+}
+
+.f-ld__bar {
+    background: var(--red);
+    transform-origin: 0;
+    height: .5em;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    transform: scaleX(0)
+}
+
+@media (max-width:809.98px) {
+    .f-ld__mark {
+        width: 110px;
+        height: 50px
+    }
+    .f-ld__labels {
+        bottom: 32px;
+        left: 16px
+    }
+    .f-ld__count {
+        font-size: clamp(64px, 24vw, 120px);
+        bottom: 30px;
+        right: 16px
+    }
+}
+
+html.lenis,
+html.lenis body {
+    height: auto
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto
+}
+
+.lenis.lenis-stopped,
+html.motion-stopped {
+    overflow: clip
+}
+
+html.ptx-burn::view-transition-group(root) {
+    animation: none
+}
+
+html.ptx-burn::view-transition-old(root) {
+    mix-blend-mode: normal;
+    animation: none
+}
+
+html.ptx-burn::view-transition-new(root) {
+    mix-blend-mode: normal;
+    animation: 6s step-end both ptx-vt-hold
+}
+
+@keyframes ptx-vt-hold {
+    0%,
+    to {
+        clip-path: inset(50%)
+    }
+}
+
+.ptx {
+    z-index: 400;
+    visibility: visible;
+    pointer-events: none;
+    contain: strict;
+    position: fixed;
+    inset: 0
+}
+
+.ptx.is-blocking {
+    pointer-events: auto;
+    cursor: progress
+}
+
+.ptx-bt-layer {
+    z-index: 400;
+    pointer-events: none;
+    contain: strict;
+    position: fixed;
+    inset: 0
+}
+
+.ptx>canvas,
+.ptx-bt-layer>canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    position: absolute;
+    inset: 0
+}
+
+canvas.gl {
+    z-index: 1;
+    pointer-events: none;
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    position: fixed;
+    inset: 0
+}
+
+canvas.gl[hidden] {
+    display: none
+}
+
+#chapters,
+.foot {
+    z-index: 3;
+    position: relative
+}
+
+.f-vid-park>video {
+    width: 1px;
+    height: 1px
+}

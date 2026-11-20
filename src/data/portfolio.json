@@ -1,0 +1,69 @@
+{
+  "identity": {
+    "name": "[Your name]",
+    "role": "Video editor",
+    "isPlaceholder": true
+  },
+  "availability": {
+    "status": "unknown",
+    "label": "Availability on request"
+  },
+  "hero": {
+    "headline": [
+      "EVERY FRAME.",
+      "A FEELING."
+    ],
+    "introduction": "I edit videos and shape stories with colour and sound."
+  },
+  "about": {
+    "headline": "Behind the cut.",
+    "biography": "Add an introduction about yourself, your editing background and the stories you enjoy creating. Describe your approach to pacing, colour, sound and the details you focus on in each project.",
+    "approach": "Describe your creative approach and what makes a good edit feel right to you.",
+    "background": "Add your professional background, experience, and the kinds of collaborators you work with.",
+    "photograph": "",
+    "isPlaceholder": true
+  },
+  "services": [
+    {
+      "title": "Video editing",
+      "description": "Shape raw footage into a focused story with thoughtful pacing, structure, and a clear sense of purpose."
+    },
+    {
+      "title": "Colour grading",
+      "description": "Create a consistent visual atmosphere, balancing colour, contrast, and the feeling of every scene."
+    },
+    {
+      "title": "Sound design",
+      "description": "Bring the edit together with considered dialogue, music, sound effects, and a balanced final mix."
+    },
+    {
+      "title": "Motion graphics",
+      "description": "Support the story with purposeful titles, transitions, and graphics made for the final format."
+    }
+  ],
+  "servicesArePlaceholders": true,
+  "software": [],
+  "skills": [],
+  "experience": [],
+  "clients": [],
+  "testimonials": [
+    {
+      "quote": "[A short, approved client testimonial goes here.]",
+      "name": "[Client name]",
+      "role": "[Project or company]",
+      "isPlaceholder": true
+    }
+  ],
+  "contact": {
+    "email": "",
+    "instagram": "",
+    "youtube": "",
+    "whatsapp": ""
+  },
+  "seo": {
+    "title": "Video Editor | Portfolio",
+    "description": "A video editor portfolio for cinematic storytelling, thoughtful editing, colour, and sound. Explore selected work and the showreel.",
+    "url": ""
+  },
+  "projects": {}
+}
