@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+await import('./extract-reference-shaders.mjs');
 const images = resolve(root, 'reference/images');
 const fonts = resolve(root, 'reference/fonts');
 await mkdir(images, { recursive: true });
