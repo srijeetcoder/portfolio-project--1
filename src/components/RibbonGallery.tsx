@@ -18,6 +18,22 @@ export function RibbonGallery({ section, signature }: { section: RefObject<HTMLE
     canvas.addEventListener('webglcontextrestored', restored);
     let cancelled = false;
     const controller = new AbortController();
+    const grid = parent.querySelector('.gallery-grid');
+    const initialCards = [...parent.querySelectorAll<HTMLElement>('.project-wrap')];
+    let refreshPending = false;
+    const replacements = new MutationObserver(() => {
+      if (cancelled || refreshPending) return;
+      const current = [...parent.querySelectorAll<HTMLElement>('.project-wrap')];
+      // A changed filter already reinitializes this effect through signature.
+      // Card replacements with the same IDs (including Fast Refresh) also
+      // need fresh texture sources and event targets.
+      if (current.map(card => card.dataset.projectId).join('|') !== signature) return;
+      if (current.some((card, index) => card !== initialCards[index])) {
+        refreshPending = true;
+        setEpoch(value => value + 1);
+      }
+    });
+    if (grid) replacements.observe(grid, { childList: true });
     void import('../lib/ribbon/renderer').then(async ({ createRibbonRenderer }) => {
       if (cancelled) return;
       parent.append(canvas);
@@ -28,7 +44,7 @@ export function RibbonGallery({ section, signature }: { section: RefObject<HTMLE
       }
       catch (error) { canvas.dataset.rendererError = error instanceof Error ? error.message : 'Renderer unavailable'; }
     });
-    return () => { cancelled = true; controller.abort(); canvas.removeEventListener('webglcontextrestored', restored); renderer.current?.dispose(); renderer.current = null; canvas.remove(); };
+    return () => { cancelled = true; replacements.disconnect(); controller.abort(); canvas.removeEventListener('webglcontextrestored', restored); renderer.current?.dispose(); renderer.current = null; canvas.remove(); };
   }, [section, signature, reduced, epoch]);
   return null;
 }

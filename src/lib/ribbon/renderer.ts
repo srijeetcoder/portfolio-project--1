@@ -302,7 +302,10 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
       const box = section.getBoundingClientRect();
       if (!flight && !forceDraw && (box.bottom < -height * 0.5 || box.top > height * 1.5)) {
         if (previouslyDrawn) { gl.clear(gl.COLOR_BUFFER_BIT); previouslyDrawn = false; }
-        cards.forEach(card => { if (settings.captionPinned) card.caption.style.visibility = 'hidden'; });
+        cards.forEach(card => {
+          if (card.dx !== 0) { card.dx = 0; card.element.style.transform = ''; }
+          if (settings.captionPinned) card.caption.style.visibility = 'hidden';
+        });
         return;
       }
       gl.useProgram(program);
@@ -346,9 +349,10 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
           if (Math.abs(dx) + Math.abs(dy) > 0.0001) dirty = true;
         }
         syncVideo(card, time);
-        const dx = Math.round(settings.diagonal * card.pose.y * width / (2 * halfWidth) * 10) / 10;
+        const onDeck = rect.top < height * 1.5 && rect.top + rect.height > -height * 0.5;
+        const dx = onDeck ? Math.round(settings.diagonal * card.pose.y * width / (2 * halfWidth) * 10) / 10 : 0;
         if (dx !== card.dx) { card.dx = dx; card.element.style.transform = dx ? `translate3d(${dx}px,0,0)` : ''; }
-        card.drawn = Boolean(card.poster) && (flight && !forceDraw ? flight.card === card : rect.top < height * 1.5 && rect.top + rect.height > -height * 0.5);
+        card.drawn = Boolean(card.poster) && (flight && !forceDraw ? flight.card === card : onDeck);
         const opacity = settings.captionFade ? 1 - smoothstep(settings.captionFrom, settings.captionTo, Math.abs(card.pose.y / halfHeight)) : 1;
         const alpha = opacity.toFixed(3);
         if (alpha !== card.captionOpacity) { card.captionOpacity = alpha; card.caption.style.opacity = alpha; }
