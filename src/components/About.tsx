@@ -11,7 +11,7 @@ export function About() {
         <h2 id="about-title" className="sr-only">About me</h2>
         <Reveal className="about-lede-wrap">
           <LiquidLede className="f-lede" text={portfolio.about.biography}>
-            <span>I'm {portfolio.identity.name}</span>
+            <span>I'm {portfolio.identity.name}.</span>
             <span className="f-face" role="img" aria-label={portfolio.about.photograph ? portfolio.identity.name : 'Profile photograph placeholder'}>
               {portfolio.about.photograph
                 ? <img className="f-face__img" src={mediaUrl(portfolio.about.photograph)} alt="" loading="lazy" width={120} height={120} />

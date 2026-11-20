@@ -30,9 +30,17 @@ export function SmoothScroll() {
     };
     const observer = new MutationObserver(syncDialog);
     observer.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['open'] });
+    const keyboard = (event: KeyboardEvent) => {
+      if (!['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) return;
+      const target = event.target as HTMLElement | null;
+      if (scrollRuntime.paused || target?.closest('input, textarea, select, video, button, [contenteditable="true"]')) return;
+      if (lenis.isScrolling === 'smooth') { lenis.stop(); lenis.start(); }
+    };
+    document.addEventListener('keydown', keyboard, { capture: true });
     syncDialog();
     return () => {
       observer.disconnect();
+      document.removeEventListener('keydown', keyboard, { capture: true });
       stop();
       lenis.destroy();
       controller.current = null;
