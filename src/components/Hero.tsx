@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Play } from 'lucide-react';
-import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { m as motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { portfolio, showreel, mediaUrl } from '../data/content';
 import editorWordmark from '../../reference/images/editor-wordmark.svg';
 import { Availability } from './Availability';

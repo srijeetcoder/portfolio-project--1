@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, Menu, X } from 'lucide-react';
-import { animate, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll } from 'motion/react';
+import { animate, m as motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll } from 'motion/react';
 import { portfolio, mediaUrl } from '../data/content';
 import editorLogo from '../../reference/images/editor-logo.svg';
 

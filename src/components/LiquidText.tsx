@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef } from 'react';
-import { useMotionValueEvent, useReducedMotion, useScroll } from 'motion/react';
+import { useInView, useMotionValueEvent, useReducedMotion, useScroll } from 'motion/react';
 import type { ReactNode, RefObject } from 'react';
 
 const svgNamespace = 'http://www.w3.org/2000/svg';
@@ -9,6 +9,7 @@ let filterSequence = 0;
 // lettering as it enters the viewport. Keep its curve and filter coefficients.
 function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false) {
   const reduced = useReducedMotion();
+  const nearby = useInView(target, { margin: '500px 0px', once: true });
   const phone = typeof window !== 'undefined' && window.matchMedia('(max-width: 809.98px)').matches;
   const { scrollYProgress } = useScroll({
     target,
@@ -21,7 +22,7 @@ function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false) {
 
   useEffect(() => {
     const root = target.current;
-    if (!root || reduced) return;
+    if (!root || reduced || !nearby) return;
     const definitions = document.createElementNS(svgNamespace, 'svg');
     definitions.classList.add('fx-defs');
     definitions.setAttribute('width', '0');
@@ -102,7 +103,7 @@ function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false) {
         record.element.style.color = record.originalColor;
       });
     };
-  }, [target, reduced, words, scrollYProgress]);
+  }, [target, reduced, words, scrollYProgress, nearby]);
 }
 
 export function LiquidHeading({ id, className, children }: { id: string; className: string; children: ReactNode }) {
