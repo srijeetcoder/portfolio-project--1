@@ -10,10 +10,11 @@ export function Reveal({ children, className = '', delay = 0 }: {
   return (
     <motion.div
       className={className}
-      initial={reducedMotion ? false : { opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.12 }}
-      transition={{ duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: reducedMotion ? 0 : 0.65, delay: reducedMotion ? 0 : delay, ease: [0.22, 1, 0.36, 1] }}
+      data-reveal
     >
       {children}
     </motion.div>

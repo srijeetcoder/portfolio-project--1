@@ -32,8 +32,8 @@ export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
       <motion.div className="hero__inner" style={{ y }}>
         <div className="hero__gradient"><ReferenceBackdrop kind="hero" /></div>
         <motion.div className="hero__logo-blend" aria-hidden="true"
-          initial={reduced ? false : { opacity: 0, y: -60 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.1, ease: [0.11, 0.06, 0.18, 1] }}>
+          initial={{ opacity: 0, y: -60 }} animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: reduced ? 0 : 1.1, ease: [0.11, 0.06, 0.18, 1] }}>
           <div className="hero__wordmark" />
         </motion.div>
         <div className="hero__silhouette" aria-hidden="true" />
@@ -41,8 +41,8 @@ export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
       </motion.div>
       <motion.div className="hero__fade" style={{ opacity: reduced ? 0 : fade }} />
       <motion.div className="atf-what hero-copy" style={{ y }}
-        initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.2 }}>
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+        transition={{ duration: reduced ? 0 : 0.8, delay: reduced ? 0 : 0.2 }}>
         <div className="atf-intro">
           <p className="atf-st hero-description">{portfolio.hero.introduction}</p>
           <div className="hero-actions">

@@ -9,7 +9,7 @@ let filterSequence = 0;
 // lettering as it enters the viewport. Keep its curve and filter coefficients.
 function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false) {
   const reduced = useReducedMotion();
-  const phone = window.matchMedia('(max-width: 809.98px)').matches;
+  const phone = typeof window !== 'undefined' && window.matchMedia('(max-width: 809.98px)').matches;
   const { scrollYProgress } = useScroll({
     target,
     offset: words
