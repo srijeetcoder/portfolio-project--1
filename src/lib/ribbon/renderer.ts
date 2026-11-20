@@ -181,16 +181,18 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
     settings = width <= 809.98 ? ribbonPhone : ribbonDesktop;
     section.classList.toggle('ribbon-mobile', settings.captionPinned);
     const dpr = Math.min(2, devicePixelRatio || 1);
-    canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
+    const pixelWidth = Math.round(width * dpr), pixelHeight = Math.round(height * dpr);
+    if (canvas.width !== pixelWidth) canvas.width = pixelWidth;
+    if (canvas.height !== pixelHeight) canvas.height = pixelHeight;
     gl!.viewport(0, 0, canvas.width, canvas.height);
     halfHeight = Math.tan(ribbonCamera.fov * Math.PI / 360) * ribbonCamera.z;
     halfWidth = halfHeight * width / height;
     const f = 1 / Math.tan(ribbonCamera.fov * Math.PI / 360), near = ribbonCamera.near, far = ribbonCamera.far;
     projection.fill(0); projection[0] = f * height / width; projection[5] = f;
     projection[10] = (far + near) / (near - far); projection[11] = -1; projection[14] = 2 * far * near / (near - far);
+    cards.forEach(card => { card.element.style.transform = ''; });
     const sectionBox = section.getBoundingClientRect();
     cards.forEach(card => {
-      card.element.style.transform = '';
       const box = card.hit.getBoundingClientRect();
       card.base = { left: box.left - sectionBox.left, top: box.top - sectionBox.top, width: box.width, height: box.height };
       card.dx = NaN;
