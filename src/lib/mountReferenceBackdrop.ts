@@ -3,11 +3,11 @@ import { createGradientMount } from './GradientMount';
 
 const settings = {
   hero: {
-    colors: ['oklch(53.9% 0.221 29.23)', 'oklch(62.8% 0.2577 29.23)', 'oklch(64.6% 0.2402 29.15)'],
+    colors: [[208, 1, 0], [255, 0, 0], [255, 48, 36]],
     scale: 1.82, offsetX: 0.04, offsetY: 0.02,
   },
   closing: {
-    colors: ['oklch(60% 0.2461 29.23)', 'oklch(63% 0.2557 28.99)', 'oklch(64.3% 0.2423 27.5)'],
+    colors: [[240, 0, 0], [255, 10, 10], [255, 43, 43]],
     scale: 1.7, offsetX: 0.06, offsetY: 0.14,
   },
 };
@@ -24,16 +24,8 @@ export async function mountReferenceBackdrop(element: HTMLElement, kind: 'hero' 
   await noise.decode();
   if (signal.aborted) return null;
   const params = settings[kind];
-  const colorCanvas = document.createElement('canvas');
-  colorCanvas.width = colorCanvas.height = 1;
-  const context = colorCanvas.getContext('2d', { willReadFrequently: true });
-  if (!context) return null;
-  const colors = params.colors.map(color => {
-    context.fillStyle = color;
-    context.fillRect(0, 0, 1, 1);
-    const pixel = context.getImageData(0, 0, 1, 1).data;
-    return [pixel[0] / 255, pixel[1] / 255, pixel[2] / 255, 1];
-  });
+  // These bytes match the original OKLCH shader uniforms exactly.
+  const colors = params.colors.map(([r, g, b]) => [r / 255, g / 255, b / 255, 1]);
   const pixelRatio = window.devicePixelRatio;
   const pixelCount = pixelRatio >= 2 || innerWidth * innerHeight * pixelRatio ** 2 > 4000000
     ? 1600000 : 2600000;

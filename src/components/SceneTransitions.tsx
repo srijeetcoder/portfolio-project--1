@@ -28,17 +28,10 @@ const contrast = (a: RGB, b: RGB) => (Math.max(luminance(a), luminance(b)) + 0.0
 // Precompute the reference's perceptual palette and contrast choices. Scroll
 // frames only select a sample; there are no pixel reads or React updates.
 function createPalette() {
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 1;
-  const context = canvas.getContext('2d', { willReadFrequently: true });
-  const parse = (color: string, fallback: RGB): RGB => {
-    if (!context) return fallback;
-    context.fillStyle = color; context.fillRect(0, 0, 1, 1);
-    const data = context.getImageData(0, 0, 1, 1).data;
-    return [data[0], data[1], data[2]];
-  };
-  const dark = parse('oklch(10.6% 0.0434 29.23)', [15, 0, 0]);
-  const paper = parse('oklch(95.7% 0.008 36.55)', [246, 240, 237]);
+  // The reference's OKLCH colours, converted to the same sRGB bytes once.
+  // Runtime canvas readbacks can stall the first frame on a cold GPU.
+  const dark: RGB = [15, 0, 0];
+  const paper: RGB = [246, 239, 237];
   const light: RGB = [255, 255, 255], a = toLab(dark), b = toLab(paper);
   return Array.from({ length: 256 }, (_, index) => {
     const t = index / 255;

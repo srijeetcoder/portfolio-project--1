@@ -162,11 +162,29 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
     };
     const move = (event: PointerEvent) => { if (card.pointer) { card.pointer = { x: event.clientX, y: event.clientY }; dirty = true; } };
     const leave = () => { card.pointer = null; hoverTo(0); };
+    let pendingSource = '';
     const load = () => {
       if (disposed || contextLost || !image.complete || !image.naturalWidth) return;
-      if (card.posterSource === image.currentSrc) return;
-      deleteTexture(card.poster);
-      card.poster = texture(image); card.posterSource = image.currentSrc; dirty = true;
+      const source = image.currentSrc;
+      if (card.posterSource === source || pendingSource === source) return;
+      pendingSource = source;
+      void (async () => {
+        let bitmap: ImageBitmap | null = null;
+        try {
+          // Prepare the flipped pixels asynchronously; ImageBitmap ignores
+          // UNPACK_FLIP_Y_WEBGL, so its orientation must be explicit.
+          if (typeof createImageBitmap === 'function') {
+            try { bitmap = await createImageBitmap(image, { imageOrientation: 'flipY', premultiplyAlpha: 'none' }); }
+            catch { /* The decoded image remains a compatible texture source. */ }
+          }
+          if (disposed || contextLost || image.currentSrc !== source || pendingSource !== source) return;
+          deleteTexture(card.poster);
+          card.poster = texture(bitmap || image); card.posterSource = source; dirty = true;
+        } finally {
+          bitmap?.close();
+          if (pendingSource === source) pendingSource = '';
+        }
+      })();
     };
     hit.addEventListener('pointerenter', enter); hit.addEventListener('pointermove', move); hit.addEventListener('pointerleave', leave);
     image.addEventListener('load', load);
