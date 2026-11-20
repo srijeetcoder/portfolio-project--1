@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { useReducedMotion } from 'motion/react';
+import { useInView, useReducedMotion } from 'motion/react';
+import { scrollRuntime } from '../lib/scrollRuntime';
 import {
   ShaderMount,
   getShaderNoiseTexture,
@@ -26,12 +27,14 @@ export function ReferenceBackdrop({ kind }: { kind: 'hero' | 'closing' }) {
   const host = useRef<HTMLDivElement>(null);
   const shader = useRef<ShaderMount | null>(null);
   const reducedMotion = useReducedMotion();
+  const inView = useInView(host, { margin: '700px 0px', once: true });
+  const shouldMount = kind === 'hero' || inView;
   const reduced = useRef(reducedMotion);
   reduced.current = reducedMotion;
 
   useEffect(() => {
     const element = host.current;
-    if (!element) return;
+    if (!element || !shouldMount) return;
     let cancelled = false;
     const params = settings[kind];
     async function mount() {
@@ -67,7 +70,7 @@ export function ReferenceBackdrop({ kind }: { kind: 'hero' | 'closing' }) {
             u_worldWidth: 0, u_worldHeight: 0, u_noiseTexture: noise,
           },
           { alpha: true },
-          reduced.current ? 0 : 0.8, 10500, 2, pixelCount,
+          reduced.current || scrollRuntime.paused ? 0 : 0.8, 10500, 2, pixelCount,
         );
         element!.classList.add('is-live');
       } catch {
@@ -81,11 +84,16 @@ export function ReferenceBackdrop({ kind }: { kind: 'hero' | 'closing' }) {
       shader.current = null;
       element.classList.remove('is-live');
     };
-  }, [kind]);
+  }, [kind, shouldMount]);
 
   useEffect(() => {
-    shader.current?.setSpeed(reducedMotion ? 0 : 0.8);
+    shader.current?.setSpeed(reducedMotion || scrollRuntime.paused ? 0 : 0.8);
   }, [reducedMotion]);
+  useEffect(() => {
+    const update = () => shader.current?.setSpeed(reduced.current || scrollRuntime.paused ? 0 : 0.8);
+    document.addEventListener('portfolio:motion-pause', update);
+    return () => document.removeEventListener('portfolio:motion-pause', update);
+  }, []);
 
   return <div className={'reference-backdrop reference-backdrop-' + kind} ref={host} aria-hidden="true" />;
 }

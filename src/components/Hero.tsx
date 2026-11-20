@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { portfolio, showreel, mediaUrl } from '../data/content';
 import editorWordmark from '../../reference/images/editor-wordmark.svg';
 import { Availability } from './Availability';
 import { ReferenceBackdrop } from './ReferenceBackdrop';
+import { RollContent } from './RollContent';
 import type { CSSProperties } from 'react';
 import type { Project } from '../types';
 
@@ -45,13 +46,13 @@ export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
         <div className="atf-intro">
           <p className="atf-st hero-description">{portfolio.hero.introduction}</p>
           <div className="hero-actions">
-            <a className="f-showall" href="#work">View my work<ArrowRight size={14} aria-hidden="true" /></a>
-            <a className="f-showall" href="#contact">Contact me<ArrowRight size={14} aria-hidden="true" /></a>
+            <a className="f-showall" href="#work"><RollContent label="View my work" /></a>
+            <a className="f-showall" href="#contact"><RollContent label="Contact me" /></a>
           </div>
         </div>
         <div className="atf-meta hero-intro">
           <button className="hero-reel f-showall" onClick={() => onPlay(showreel)}>
-            <Play size={13} fill="currentColor" strokeWidth={0} aria-hidden="true" />Watch showreel
+            <Play size={13} fill="currentColor" strokeWidth={0} aria-hidden="true" /><RollContent label="Watch showreel" arrow={false} />
           </button>
           <Availability />
         </div>

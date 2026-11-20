@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useInView, useReducedMotion } from 'motion/react';
 import { mediaUrl, projects } from '../data/content';
 import { visuals } from '../data/visuals';
 import { LiquidHeading } from './LiquidText';
 import { RibbonGallery } from './RibbonGallery';
+import { RollContent } from './RollContent';
 import type { CSSProperties, PointerEvent } from 'react';
 import type { Project } from '../types';
 
@@ -119,7 +120,7 @@ export function ProjectGallery({ onPlay, playerOpen }: { onPlay: (project: Proje
       <div className="f-work__head">
         <LiquidHeading id="work-title" className="work__heading">Latest Work</LiquidHeading>
         <a className="f-showall" href="#track" onClick={() => { setFilter('all'); setActivePreview(null); }}>
-          Show all<ArrowRight size={14} aria-hidden="true" />
+          <RollContent label="Show all" />
         </a>
         {placeholders && <p className="reference-preview-note">Reference previews. Original videos coming soon.</p>}
       </div>

@@ -1,5 +1,5 @@
-import { ArrowRight } from 'lucide-react';
 import { portfolio } from '../data/content';
+import { RollContent } from './RollContent';
 
 export function Contact() {
   const email = portfolio.contact.email;
@@ -12,8 +12,8 @@ export function Contact() {
           : <span className="f-contact__mail contact-email">[Your email address]</span>}
         <div className="contact-actions f-contact__go">
           {email
-            ? <a className="f-showall" href={'mailto:' + email}>Start a project<ArrowRight size={14} aria-hidden="true" /></a>
-            : <button className="f-showall" disabled>Contact coming soon<ArrowRight size={14} aria-hidden="true" /></button>}
+            ? <a className="f-showall" href={'mailto:' + email}><RollContent label="Start a project" /></a>
+            : <button className="f-showall" disabled><RollContent label="Contact coming soon" /></button>}
         </div>
       </div>
     </section>

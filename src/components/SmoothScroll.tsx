@@ -20,7 +20,12 @@ export function SmoothScroll() {
       scrollRuntime.lag = state.targetScroll - state.animatedScroll;
     });
     const syncDialog = () => {
-      if (document.querySelector('dialog[open]')) lenis.stop();
+      const paused = Boolean(document.querySelector('dialog[open]'));
+      if (paused !== scrollRuntime.paused) {
+        scrollRuntime.paused = paused;
+        document.dispatchEvent(new Event('portfolio:motion-pause'));
+      }
+      if (paused) lenis.stop();
       else lenis.start();
     };
     const observer = new MutationObserver(syncDialog);
@@ -33,6 +38,8 @@ export function SmoothScroll() {
       controller.current = null;
       scrollRuntime.smooth = false;
       scrollRuntime.lag = 0;
+      scrollRuntime.paused = false;
+      document.dispatchEvent(new Event('portfolio:motion-pause'));
     };
   }, [reduced]);
   return null;

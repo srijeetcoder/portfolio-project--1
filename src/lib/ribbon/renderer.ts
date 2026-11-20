@@ -224,6 +224,12 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLEle
     float('u_alpha', 1); float('u_flat', 0); float('u_lift', 0); vec2('u_stretch', 0, 0);
     gl!.uniform1i(location('u_texture'), 0); gl!.uniform1i(location('u_texB'), 1);
     dirty = true;
+    if (snapshot && held) {
+      captureBackground(held.card);
+      dirty = true;
+      if (flight) renderer.frame(lastTime, 0);
+      else gl!.clear(gl!.COLOR_BUFFER_BIT);
+    }
   }
 
   function cancelVideo(card: Card) {
@@ -274,6 +280,7 @@ export function createRibbonRenderer(canvas: HTMLCanvasElement, section: HTMLEle
     frame(time, delta) {
       lastTime = time;
       if (disposed || contextLost || document.hidden) return;
+      if (scrollRuntime.paused && !flight && !forceDraw) return;
       const scroll = scrollRuntime.smooth ? scrollRuntime.y : window.scrollY;
       const normalizedDelta = clamp(delta / (1000 / 60), 0, 3);
       if (held && !flight && !forceDraw) return;

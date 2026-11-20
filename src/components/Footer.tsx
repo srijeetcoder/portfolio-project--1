@@ -2,6 +2,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { portfolio, mediaUrl } from '../data/content';
 import editorLogo from '../../reference/images/editor-logo.svg';
 import { Availability } from './Availability';
+import { RollContent } from './RollContent';
 
 const socials = [
   { label: 'Instagram', key: 'instagram' },
@@ -45,7 +46,7 @@ export function Footer() {
         <a className="foot__logo" href="#hero" aria-label="Back to top"><img src={logo} alt={portfolio.identity.name} width={274} height={125} /></a>
         <p className="f-foot__where">{portfolio.identity.role}</p>
         <p className="f-foot__copy">&copy; {new Date().getFullYear()} {portfolio.identity.name}</p>
-        <div className="f-foot__legal"><a className="f-showall" href="#hero">Back to top<ArrowUpRight size={14} aria-hidden="true" /></a></div>
+        <div className="f-foot__legal"><a className="f-showall" href="#hero"><RollContent label="Back to top" upward /></a></div>
       </div>
     </footer>
   );
