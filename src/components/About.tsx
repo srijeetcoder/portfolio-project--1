@@ -2,6 +2,7 @@ import { UserRound } from 'lucide-react';
 import { portfolio, mediaUrl } from '../data/content';
 import { Reveal } from './Reveal';
 import { LiquidLede } from './LiquidText';
+import { LineReveal } from './LineReveal';
 
 export function About() {
   const tools = portfolio.software.length ? portfolio.software : ['[Editing software]', '[Colour tools]', '[Audio tools]'];
@@ -9,21 +10,21 @@ export function About() {
     <section id="about" className="f-sec f-about chapter-section" data-tone="white" aria-labelledby="about-title">
       <div className="f-grid">
         <h2 id="about-title" className="sr-only">About me</h2>
-        <Reveal className="about-lede-wrap">
+        <div className="about-lede-wrap">
           <LiquidLede className="f-lede" text={portfolio.about.biography}>
-            <span>I'm {portfolio.identity.name}.</span>
-            <span className="f-face" role="img" aria-label={portfolio.about.photograph ? portfolio.identity.name : 'Profile photograph placeholder'}>
+            <span className="f-w">I'm</span>{' '}<span className="f-w">{portfolio.identity.name}.</span>{' '}
+            <span className="f-w f-face" role="img" aria-label={portfolio.about.photograph ? portfolio.identity.name : 'Profile photograph placeholder'}>
               {portfolio.about.photograph
                 ? <img className="f-face__img" src={mediaUrl(portfolio.about.photograph)} alt="" loading="lazy" width={120} height={120} />
                 : <UserRound size={52} strokeWidth={1.2} aria-hidden="true" />}
             </span>
           </LiquidLede>
           {portfolio.about.isPlaceholder && <p className="placeholder-note">Biography placeholder</p>}
-        </Reveal>
-        <Reveal className="f-about__body">
-          <p>{portfolio.about.approach}</p>
-          <p>{portfolio.about.background}</p>
-        </Reveal>
+        </div>
+        <div className="f-about__body">
+          <LineReveal>{portfolio.about.approach}</LineReveal>
+          <LineReveal delay={0.08}>{portfolio.about.background}</LineReveal>
+        </div>
         <Reveal className="software-section">
           <h3>Software &amp; skills</h3>
           <div className="software-list">{tools.map(tool => <span key={tool}>{tool}</span>)}</div>
