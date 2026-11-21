@@ -78,7 +78,7 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
   const textures = new Set<WebGLTexture>();
   let width = innerWidth, height = innerHeight, halfWidth = 1, halfHeight = 1;
   let settings: RibbonSettings = ribbonDesktop;
-  let dirty = true, disposed = false, contextLost = false, previouslyDrawn = false, velocity = 0, lastScroll = NaN, lastTime = 0;
+  let dirty = true, disposed = false, contextLost = false, previouslyDrawn = false, velocity = 0, lastScroll = NaN, lastTime = 0, lastSectionTop = NaN;
   let flight: Flight | null = null, held: Flight | null = null, snapshot: HTMLCanvasElement | null = null;
   let forceDraw = false, removeSnapshotAfterDraw = false;
   const projection = new Float32Array(16), model = new Float32Array(16);
@@ -300,6 +300,8 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
       if (Math.abs(nextVelocity - velocity) > 0.0001 || Math.abs(scroll - lastScroll) > 0.01) dirty = true;
       velocity = nextVelocity < 0.0005 ? 0 : nextVelocity; lastScroll = scroll;
       const box = section.getBoundingClientRect();
+      if (!Number.isFinite(lastSectionTop) || Math.abs(box.top - lastSectionTop) > 0.1) dirty = true;
+      lastSectionTop = box.top;
       if (!flight && !forceDraw && (box.bottom < -height * 0.5 || box.top > height * 1.5)) {
         if (previouslyDrawn) { gl.clear(gl.COLOR_BUFFER_BIT); previouslyDrawn = false; }
         cards.forEach(card => {
