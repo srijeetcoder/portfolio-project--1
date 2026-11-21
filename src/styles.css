@@ -195,26 +195,24 @@ img, video { max-width: 100%; }
   transition: opacity .6s var(--ease-reveal);
 }
 .video-dialog[open]::before { opacity: 1; }
+.video-dialog::backdrop { background: transparent; }
 
 /* Accent light glow for media panel (showreel/project cards) */
 .media-panel::before {
-  content: ''; position: absolute; inset: -20%; z-index: -1; pointer-events: none;
-  background: var(--media-accent-glow, radial-gradient(ellipse at 50% 50%, rgb(255 255 255 / .08), transparent 70%));
-  filter: blur(40px);
-  opacity: 0;
+  content: ''; position: absolute; inset: -30%; z-index: -1; pointer-events: none;
+  background: var(--media-accent-glow, radial-gradient(ellipse at 50% 50%, rgb(255 255 255 / .25), transparent 70%));
+  filter: blur(50px);
+  opacity: 1;
   border-radius: 12px;
-  transition: opacity .5s var(--ease-reveal);
 }
-.media-panel:hover::before,
-.media-panel:focus-within::before { opacity: 1; }
 
 /* Color variants for accent glow - can be applied per project */
-.media-panel[data-accent="white"] { --media-accent-glow: radial-gradient(ellipse at 50% 50%, rgb(255 255 255 / .15), transparent 70%); }
-.media-panel[data-accent="blue"] { --media-accent-glow: radial-gradient(ellipse at 50% 50%, rgb(96 165 250 / .18), transparent 70%); }
-.media-panel[data-accent="red"] { --media-accent-glow: radial-gradient(ellipse at 50% 50%, rgb(239 68 68 / .18), transparent 70%); }
-.media-panel[data-accent="amber"] { --media-accent-glow: radial-gradient(ellipse at 50% 50%, rgb(245 158 11 / .18), transparent 70%); }
-.media-panel[data-accent="green"] { --media-accent-glow: radial-gradient(ellipse at 50% 50%, rgb(34 197 94 / .18), transparent 70%); }
-.media-panel[data-accent="purple"] { --media-accent-glow: radial-gradient(ellipse at 50% 50%, rgb(168 85 247 / .18), transparent 70%); }
+.media-panel[data-accent="white"] { --media-accent-glow: radial-gradient(ellipse at 50% 50%, rgb(255 255 255 / .3), transparent 70%); }
+.media-panel[data-accent="blue"] { --media-accent-glow: radial-gradient(ellipse at 50% 50%, rgb(96 165 250 / .35), transparent 70%); }
+.media-panel[data-accent="red"] { --media-accent-glow: radial-gradient(ellipse at 50% 50%, rgb(239 68 68 / .35), transparent 70%); }
+.media-panel[data-accent="amber"] { --media-accent-glow: radial-gradient(ellipse at 50% 50%, rgb(245 158 11 / .35), transparent 70%); }
+.media-panel[data-accent="green"] { --media-accent-glow: radial-gradient(ellipse at 50% 50%, rgb(34 197 94 / .35), transparent 70%); }
+.media-panel[data-accent="purple"] { --media-accent-glow: radial-gradient(ellipse at 50% 50%, rgb(168 85 247 / .35), transparent 70%); }
 
 .video-dialog[data-accent="white"] { --accent-glow: radial-gradient(ellipse at 50% 50%, rgb(255 255 255 / .15), transparent 70%); }
 .video-dialog[data-accent="blue"] { --accent-glow: radial-gradient(ellipse at 50% 50%, rgb(96 165 250 / .15), transparent 70%); }
