@@ -75,7 +75,7 @@ export default function VideoPlayer({ project, onClose }: { project: Project; on
       else if (reduced) onClose();
       else closeTimer.current = setTimeout(onClose, 340);
     };
-    if (document.fullscreenElement === dialogRef.current) void document.exitFullscreen().catch(() => {}).then(close);
+    if (document.fullscreenElement && dialogRef.current?.contains(document.fullscreenElement)) void document.exitFullscreen().catch(() => {}).then(close);
     else close();
   }
 

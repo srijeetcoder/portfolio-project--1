@@ -43,7 +43,7 @@ export function PlayerControls({ videoRef, dialogRef, disabled }: {
     if (!dialog) return;
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
-      else await dialog.requestFullscreen();
+      else await dialog.querySelector<HTMLElement>('.player-shell')?.requestFullscreen();
     } catch { /* The viewport theater remains available if fullscreen is declined. */ }
     reveal.current();
   };
@@ -105,7 +105,7 @@ export function PlayerControls({ videoRef, dialogRef, disabled }: {
       setMuted(video.muted || video.volume === 0);
       if (volume.current) volume.current.value = String(video.muted ? 0 : video.volume);
     };
-    const screen = () => setFullscreen(document.fullscreenElement === dialog);
+    const screen = () => setFullscreen(Boolean(document.fullscreenElement && dialog.contains(document.fullscreenElement)));
     const release = () => {
       if (!dragging.current) return;
       dragging.current = false; delete dialog.dataset.scrubbing;
@@ -122,7 +122,7 @@ export function PlayerControls({ videoRef, dialogRef, disabled }: {
       else if (key === 'arrowleft' || key === 'arrowright') { event.preventDefault(); seekTo(video.currentTime + (key === 'arrowleft' ? -5 : 5)); }
     };
     const visibility = () => { cancelFrame(); if (!document.hidden) status(); };
-    setCanFullscreen(Boolean(document.fullscreenEnabled && dialog.requestFullscreen));
+    setCanFullscreen(Boolean(document.fullscreenEnabled && dialog.querySelector<HTMLElement>('.player-shell')?.requestFullscreen));
     metadata(); sound(); status(); screen();
     video.addEventListener('loadedmetadata', metadata); video.addEventListener('durationchange', metadata);
     video.addEventListener('play', status); video.addEventListener('pause', status); video.addEventListener('ended', status);
