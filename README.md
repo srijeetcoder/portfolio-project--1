@@ -38,8 +38,11 @@ PAPON PORTFOLIO/
     cinematic/
     reels/
     other/
+    papon portfolio/          FIRST through FIFTH, original owner footage
+    .previews/                Generated muted hover clips, kept locally
   public/
     posters/                  Generated compressed video posters
+    loading/                  Desktop and phone marble fallback artwork
     favicon.png
     social-cover.webp
   src/
@@ -52,6 +55,10 @@ PAPON PORTFOLIO/
       GradientMount.ts        Worker coordination and compatible WebGL fallback
       compileProgram.ts       Non-blocking shader compilation
       scrollRuntime.ts        Continuous scroll values and motion coordination
+      bootRuntime.ts          Weighted loading readiness and opening handoff
+      loadingMarble.ts        Rotating WebGL stone and gray studio environment
+      usePinnedScene.ts       Responsive staged scroll measurements
+      motionSettings.ts       Shared reference reveal timing and easing
     data/
       portfolio.json          Editable content, contact links, project overrides
       media.generated.json    Scanned local media; generated automatically
@@ -65,8 +72,8 @@ PAPON PORTFOLIO/
     setup-assets.mjs           Prepares reference copies and local assets
     extract-reference-shaders.mjs  Recovers the reference's surface shaders
     prerender.mjs             Emits static page markup before client hydration
-    sync-media.mjs             Scans videos and compresses/generates posters
-    copy-videos.mjs            Copies original local media into the build
+    sync-media.mjs             Orders videos and generates posters and previews
+    copy-videos.mjs            Copies original media and previews into the build
   package.json
   vite.config.ts
 ~~~
@@ -145,11 +152,11 @@ The reference's inline mobile navigation is retained when it fits; phones below 
 
 Layouts have been checked at 1440x900, 1280x720, 1280x600, 768x1024, 768x600, 390x844, 320x720, and 320x600. Short screens retain visible hero actions; the background mask is separate from the readable introduction and links. All sections were inspected at desktop and phone sizes. Reduced motion disables liquid effects, parallax, and automatic previews and freezes the background animation; the native gallery retains correct caption spacing when WebGL is unavailable.
 
-Isolated browser fixtures verified muted playback, lazy video sources, category filters, portrait presentation, seeking, error retry, showreel playback, reverse viewer transitions, and focus restoration on desktop and phone. The fixtures live in the ignored `.qa/` folder and are injected only into test browser sessions. They do not change the site's media manifest, personal configuration, or original videos.
+Browser checks with all five supplied clips verified their order, muted playback, lazy video sources, category filters, portrait presentation, seeking, showreel playback, and keyboard dismissal on desktop and phone. The staged scroll sequences also passed forward and reverse checks at 1440x900, 1280x600, 390x844, and 320x600, plus reduced motion. Production startup, static preview-video paths, and loading fallbacks with JavaScript or WebGL unavailable were checked separately. Verification scripts and screenshots are kept in the ignored `.qa/` folder.
 
 SEO and social-sharing metadata come from the central configuration. Production emits prerendered page markup and hydrates it in React. Local fonts and responsive 640px, 960px, and full-size compressed posters are bundled into the site; actual videos are requested only when a preview or player is activated. Motion features and the gallery renderer load separately.
 
-The final production Lighthouse audits scored **99 desktop / 88 simulated mobile** for performance and **100** for accessibility, best practices, and SEO on both devices. Desktop LCP was 0.9 seconds with 20 ms of blocking time; simulated mobile LCP was 3.9 seconds with 30 ms of blocking time. Both recorded zero layout shift. The slower mobile simulation remains limited by the large hero asset's paint timing; results should be measured again with the owner's final footage and content.
+Earlier production Lighthouse audits, run before the supplied footage and marble loading scene were integrated, recorded strong desktop performance and zero layout shift; simulated mobile LCP was approximately 3.9 seconds. These are baseline measurements. Re-run Lighthouse on the final deployment with the owner's content to measure current loading performance on target devices.
 
 ## Regenerate reference copies and assets
 
