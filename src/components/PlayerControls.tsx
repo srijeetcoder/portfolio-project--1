@@ -75,8 +75,8 @@ export function PlayerControls({ videoRef, dialogRef, disabled }: {
       bar.style.setProperty('--playback-progress', String(total ? time / total : 0));
       if (seek.current && !dragging.current) seek.current.value = String(time);
       const label = clock(time);
-      if (label !== lastClock) {
-        lastClock = label;
+      if (label + '|' + clock(total) !== lastClock) {
+        lastClock = label + '|' + clock(total);
         if (current.current) current.current.textContent = label;
         seek.current?.setAttribute('aria-valuetext', `${label} of ${clock(total)}`);
       }
