@@ -48,6 +48,7 @@ export function LineReveal({ children, className = '', delay = 0 }: {
 }) {
   const ref = useRef<HTMLParagraphElement>(null);
   const reduced = useReducedMotion();
+  const nearby = useInView(ref, { once: true, margin: '500px 0px' });
   const entered = useInView(ref, { once: true, margin: revealTiming.margin });
   const played = useRef(false);
   const [lines, setLines] = useState<string[] | null>(null);
@@ -60,7 +61,7 @@ export function LineReveal({ children, className = '', delay = 0 }: {
 
   useEffect(() => {
     const element = ref.current;
-    if (!element || reduced) return;
+    if (!element || reduced || !nearby) return;
     let cancelled = false, lastMeasure = '';
     const measure = (force = false) => {
       if (cancelled || !element.clientWidth) return;
@@ -79,7 +80,7 @@ export function LineReveal({ children, className = '', delay = 0 }: {
     resize();
     void document.fonts.ready.then(() => measure(true));
     return () => { cancelled = true; observer.disconnect(); query.removeEventListener('change', resize); };
-  }, [text, reduced]);
+  }, [text, reduced, nearby]);
 
   return (
     <p className={`line-reveal ${className}`} ref={ref} data-line-reveal>
