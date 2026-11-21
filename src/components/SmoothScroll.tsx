@@ -10,6 +10,13 @@ export function SmoothScroll() {
   useAnimationFrame((_time, delta) => {
     const time = performance.now();
     const lenis = controller.current;
+    // Hash changes, keyboard navigation and native scrollbar jumps can land
+    // between Lenis' own scroll events. Adopt their position before another
+    // wheel gesture so its target starts from the visible section.
+    if (lenis && lenis.isScrolling !== 'smooth' && !scrollRuntime.paused) {
+      lenis.animatedScroll = window.scrollY;
+      lenis.targetScroll = window.scrollY;
+    }
     lenis?.raf(time);
     const smooth = lenis?.isScrolling === 'smooth';
     emitScrollFrame(time, delta, smooth ? lenis.animatedScroll : window.scrollY,
