@@ -18,6 +18,13 @@ export function durationLabel(duration: number | null) {
 
 function enrichProject(item: MediaLibrary['projects'][number]): Project {
   const details = portfolio.projects[item.file] ?? {};
+  const accentMap: Record<string, Project['accent']> = {
+    'papon portfolio/FIRST.mp4': 'white',
+    'papon portfolio/SECOND.mp4': 'blue',
+    'papon portfolio/THIRD.mp4': 'red',
+    'papon portfolio/FOURTH.mp4': 'amber',
+    'papon portfolio/FIFTH.mp4': 'green',
+  };
   return {
     ...item,
     title: details.title || item.filename.replace(/\.[^.]+$/, ''),
@@ -28,6 +35,7 @@ function enrichProject(item: MediaLibrary['projects'][number]): Project {
     posterSources: details.poster ? [] : item.posterSources,
     year: details.year,
     isPlaceholder: false,
+    accent: accentMap[item.file] ?? 'purple',
   };
 }
 
@@ -53,9 +61,9 @@ export const projects: Project[] = mediaLibrary.projects.length
     }));
 
 export const showreel: Project = mediaLibrary.showreel
-  ? { ...enrichProject(mediaLibrary.showreel), title: 'Showreel', description: '', category: 'Showreel', categoryId: 'showreel' }
+  ? { ...enrichProject(mediaLibrary.showreel), title: 'Showreel', description: '', category: 'Showreel', categoryId: 'showreel', accent: 'white' }
   : mediaLibrary.projects.length ? { ...enrichProject(mediaLibrary.projects[0]), id: 'showreel-' + mediaLibrary.projects[0].id,
-      category: 'Featured edit', description: '' }
+      category: 'Featured edit', description: '', accent: 'white' }
   : {
       id: 'showreel-placeholder',
       file: '',
@@ -71,4 +79,5 @@ export const showreel: Project = mediaLibrary.showreel
       title: 'Showreel',
       description: '',
       isPlaceholder: true,
+      accent: 'white',
     };

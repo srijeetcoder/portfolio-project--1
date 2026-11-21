@@ -95,10 +95,12 @@ export default function VideoPlayer({ project, onClose }: { project: Project; on
     }
   }
 
+  const accentAttr = project.accent ? { 'data-accent': project.accent } : {};
   return (
     <dialog
       ref={dialogRef}
       className={'video-dialog' + (flying ? ' has-ribbon-flight' : '') + (closing ? ' is-closing' : '')}
+      {...accentAttr}
       aria-labelledby={titleId}
       onCancel={event => { event.preventDefault(); requestClose(); }}
       onClick={event => { if (event.target === event.currentTarget) requestClose(); }}

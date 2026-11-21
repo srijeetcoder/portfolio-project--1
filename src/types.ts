@@ -41,6 +41,7 @@ export interface Project extends MediaItem {
   year?: string;
   isPlaceholder: boolean;
   imageAspect?: string;
+  accent?: 'white' | 'blue' | 'red' | 'amber' | 'green' | 'purple';
 }
 
 export interface PortfolioConfig {

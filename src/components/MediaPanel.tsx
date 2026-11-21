@@ -40,9 +40,11 @@ export function MediaPanel({ item, onPlay, hero = false, buttonRef, focus }: {
     return () => control.stop();
   }, [visible, reduced, captionEntrance]);
   const poster = item.poster?.startsWith('/posters/') ? mediaUrl(item.poster) : (item.poster || visuals.hero);
+  const accentAttr = item.accent ? { 'data-accent': item.accent } : {};
   return (
     <figure className={'media-panel' + (hero ? ' hero-media' : ' showreel-media') + (portrait ? ' media-panel--portrait' : '')}
-      style={{ '--media-ratio': ratio } as CSSProperties}>
+      style={{ '--media-ratio': ratio } as CSSProperties}
+      {...accentAttr}>
       <motion.button ref={ref} className="media-panel-button" onClick={() => onPlay(item)} aria-label={
         item.isPlaceholder ? 'Preview the showreel space, original footage coming soon' : 'Play showreel'
       }
@@ -71,7 +73,7 @@ export function MediaPanel({ item, onPlay, hero = false, buttonRef, focus }: {
         <span className="media-shade" aria-hidden="true" />
         <span className="media-play" aria-hidden="true">
           <span className="play-circle"><Play size={24} fill="currentColor" strokeWidth={0} /></span>
-          <span className="play-label">Watch showreel</span>
+          <span className="play-label">Play</span>
         </span>
       </motion.button>
       <motion.figcaption className="media-caption" style={{ opacity: captionOpacity }}>

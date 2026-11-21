@@ -1,18 +1,20 @@
 import { useEffect, useRef } from 'react';
-import { Play } from 'lucide-react';
 import { animate, m as motion, useMotionValue, useMotionValueEvent, useReducedMotion, useTransform } from 'motion/react';
-import { portfolio, showreel, mediaUrl } from '../data/content';
+import { portfolio, mediaUrl } from '../data/content';
 import editorWordmark from '../../reference/images/editor-wordmark.svg';
 import heroPoster from '../../reference/images/reference-hero.webp';
 import { Availability } from './Availability';
 import { ReferenceBackdrop } from './ReferenceBackdrop';
 import { RollContent } from './RollContent';
+import { LiveTimeLocation } from './LiveTimeLocation';
 import { usePinnedScene } from '../lib/usePinnedScene';
 import { usePortfolioReady } from '../lib/bootRuntime';
 import type { CSSProperties } from 'react';
 import type { Project } from '../types';
 
 export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
+  // onPlay is kept for API compatibility but no longer used in Hero since Watch Showreel was replaced
+  void onPlay;
   const sceneRef = useRef<HTMLElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
@@ -75,9 +77,7 @@ export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
           </div>
         </div>
         <div className="atf-meta hero-intro">
-          <button className="hero-reel f-showall" onClick={() => onPlay(showreel)}>
-            <Play size={13} fill="currentColor" strokeWidth={0} aria-hidden="true" /><RollContent label="Watch showreel" arrow={false} />
-          </button>
+          <LiveTimeLocation />
           <Availability />
         </div>
       </motion.div>
