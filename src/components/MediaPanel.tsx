@@ -6,7 +6,7 @@ import { visuals } from '../data/visuals';
 import { easeOutExpo, revealTiming } from '../lib/motionSettings';
 import type { Project } from '../types';
 import type { MotionValue } from 'motion/react';
-import type { RefObject } from 'react';
+import type { CSSProperties, RefObject } from 'react';
 
 export interface TheaterFocus {
   x: MotionValue<number>;
@@ -29,6 +29,8 @@ export function MediaPanel({ item, onPlay, hero = false, buttonRef, focus }: {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const imageY = useTransform(scrollYProgress, value => reduced ? '0%' : `${(0.5 - value) * 7}%`);
   const visible = reduced || entered;
+  const ratio = item.width && item.height ? item.width / item.height : 16 / 9;
+  const portrait = ratio < 1;
   const captionEntrance = useMotionValue(0);
   const fullOpacity = useMotionValue(1);
   const captionOpacity = useTransform([captionEntrance, focus?.captionOpacity ?? fullOpacity], values =>
@@ -39,11 +41,12 @@ export function MediaPanel({ item, onPlay, hero = false, buttonRef, focus }: {
   }, [visible, reduced, captionEntrance]);
   const poster = item.poster?.startsWith('/posters/') ? mediaUrl(item.poster) : (item.poster || visuals.hero);
   return (
-    <figure className={'media-panel' + (hero ? ' hero-media' : ' showreel-media')}>
+    <figure className={'media-panel' + (hero ? ' hero-media' : ' showreel-media') + (portrait ? ' media-panel--portrait' : '')}
+      style={{ '--media-ratio': ratio } as CSSProperties}>
       <motion.button ref={ref} className="media-panel-button" onClick={() => onPlay(item)} aria-label={
         item.isPlaceholder ? 'Preview the showreel space, original footage coming soon' : 'Play showreel'
       }
-        style={focus ? { x: focus.x, y: focus.y, scale: focus.scale, transformOrigin: '0% 0%' } : undefined}
+        style={{ aspectRatio: ratio, ...(focus ? { x: focus.x, y: focus.y, scale: focus.scale, transformOrigin: '0% 0%' } : {}) }}
         initial={reduced ? false : { clipPath: 'inset(100% 0% 0% 0%)' }}
         animate={{ clipPath: visible ? 'inset(0% 0% 0% 0%)' : 'inset(100% 0% 0% 0%)' }}
         transition={{ duration: reduced ? 0 : revealTiming.figure.duration, ease: easeOutExpo }}>
@@ -52,7 +55,7 @@ export function MediaPanel({ item, onPlay, hero = false, buttonRef, focus }: {
             <motion.img
               src={poster}
               srcSet={item.posterSources?.map(source => mediaUrl(source.src) + ' ' + source.width + 'w').join(', ')}
-              sizes="(max-width: 809px) calc(100vw - 40px), 72vw"
+              sizes={portrait ? '(max-width: 809px) 45vw, 35vw' : '(max-width: 809px) calc(100vw - 40px), 72vw'}
               alt={item.isPlaceholder ? 'Red grain artwork for the upcoming showreel' : 'Showreel poster'}
               width={item.width || 1800}
               height={item.height || 1200}

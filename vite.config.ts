@@ -22,7 +22,7 @@ export default defineConfig({
         }));
       },
       configurePreviewServer(server) {
-        server.middlewares.use('/previews', serveStatic(resolve(server.config.build.outDir, 'videos/.previews'), { fallthrough: false, index: false }));
+        server.middlewares.use('/previews', serveStatic(resolve(server.config.build.outDir, 'previews'), { fallthrough: false, index: false }));
         server.middlewares.use('/videos', serveStatic(resolve(server.config.build.outDir, 'videos'), {
           fallthrough: false,
           index: false,

@@ -107,7 +107,7 @@ async function readMetadata(path) {
 async function compressedPoster(input, output) {
   await sharp(input)
     .rotate()
-    .resize({ width: 1280, height: 1280, fit: 'inside', withoutEnlargement: true })
+    .resize({ width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true })
     .webp({ quality: 78, effort: 4 })
     .toFile(output);
 }
@@ -130,7 +130,7 @@ async function createPoster(video, thumbnail, metadata, output) {
     const result = await run(ffmpeg, [
       '-hide_banner', '-loglevel', 'error',
       '-ss', String(seek), '-i', resolve(videoRoot, video),
-      '-frames:v', '1', '-vf', 'scale=1280:-2:force_original_aspect_ratio=decrease',
+      '-frames:v', '1', '-vf', 'scale=1600:-2:force_original_aspect_ratio=decrease',
       '-f', 'image2pipe', '-vcodec', 'png', 'pipe:1',
     ], { encoding: 'buffer', maxBuffer: 32 * 1024 * 1024, timeout: 45000, windowsHide: true });
     await compressedPoster(result.stdout, output);
@@ -216,7 +216,9 @@ for (const [key, variants] of groups) {
   })).digest('hex');
   const output = resolve(posterRoot, 'project-' + id + '.webp');
   const cachedItem = cached.get(id);
-  if (cachedItem?.fingerprint === fingerprint && cachedItem.poster && cachedItem.posterSources?.length && await exists(output) &&
+  const expectedWidth = cachedItem?.width && cachedItem?.height ? Math.floor(Math.min(cachedItem.width, 1600, 1600 * cachedItem.width / cachedItem.height)) : 0;
+  const cachedWidth = Math.max(0, ...(cachedItem?.posterSources || []).map(source => source.width));
+  if (cachedWidth >= expectedWidth && cachedItem?.fingerprint === fingerprint && cachedItem.poster && cachedItem.posterSources?.length && await exists(output) &&
       (await Promise.all(cachedItem.posterSources.map(source => exists(resolve(root, 'public', source.src.slice(1)))))).every(Boolean)) {
     const previewSources = await createPreview(file, cachedItem, id, fingerprint);
     media.push({ ...cachedItem, ...category(file), previewSources });

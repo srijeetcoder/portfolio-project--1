@@ -245,6 +245,7 @@ img, video { max-width: 100%; }
 .showreel-heading { grid-column: 1/-1; }
 .showreel-wrap { grid-column: 4/-1; margin-top: 9vh; }
 .media-panel { margin: 0; width: 100%; }
+.media-panel--portrait { width: min(100%, calc(58svh * var(--media-ratio))); margin-inline: auto; }
 .media-panel-button { position: relative; display: block; width: 100%; aspect-ratio: 16/9; padding: 0; border: 0; overflow: hidden; border-radius: 6px; background: var(--black); }
 .media-parallax { position: absolute; inset: -5%; display: block; }
 .media-hover-zoom { position: absolute; inset: 0; display: block; transition: transform 1s var(--appear-ease); }
