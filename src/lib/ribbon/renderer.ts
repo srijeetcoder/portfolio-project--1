@@ -23,13 +23,13 @@ function tweenValue(tween: Tween, time: number, expo = false) {
   return progress < 1;
 }
 interface Card {
-  element: HTMLElement; hit: HTMLButtonElement; image: HTMLImageElement; caption: HTMLElement;
+  element: HTMLElement; hit: HTMLButtonElement; image: HTMLImageElement; caption: HTMLElement; cue: HTMLElement;
   base: { left: number; top: number; width: number; height: number };
   pose: { x: number; y: number; w: number; h: number };
   poster: WebGLTexture | null; posterSource: string; videoTexture: WebGLTexture | null;
   video: HTMLVideoElement | null; videoSize: [number, number]; videoFrame: number | null; videoDirty: boolean;
   pointer: { x: number; y: number } | null; mouse: { x: number; y: number };
-  hover: Tween; fade: Tween; drawn: boolean; focused: boolean; dx: number; captionOpacity: string; captionPosition: string;
+  hover: Tween; fade: Tween; drawn: boolean; focused: boolean; dx: number; captionOpacity: string; captionPosition: string; cuePosition: string;
   flat: number; lift: number; stretch: [number, number];
   disposeEvents: () => void;
 }
@@ -151,10 +151,17 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
     const hit = element.querySelector<HTMLButtonElement>('.project-card')!;
     const image = element.querySelector<HTMLImageElement>('.proj__img')!;
     const caption = element.querySelector<HTMLElement>('.proj__cap')!;
-    const card: Card = { element, hit, image, caption, base: { left: 0, top: 0, width: 1, height: 1 }, pose: { x: 0, y: 0, w: 1, h: 1 },
+    // The cue sits above the shared WebGL canvas and follows the actual curved
+    // edge, rather than disappearing beneath the image's rendered surface.
+    const cue = document.createElement('span');
+    cue.className = 'ribbon-cue-anchor'; cue.setAttribute('aria-hidden', 'true');
+    const cueTemplate = element.querySelector('.project-play-cue');
+    if (cueTemplate) cue.append(cueTemplate.cloneNode(true));
+    section.append(cue);
+    const card: Card = { element, hit, image, caption, cue, base: { left: 0, top: 0, width: 1, height: 1 }, pose: { x: 0, y: 0, w: 1, h: 1 },
       poster: null, posterSource: '', videoTexture: null, video: null, videoSize: [1, 1], videoFrame: null, videoDirty: false,
       pointer: null, mouse: { x: 0.5, y: 0.5 }, hover: { from: 0, to: 0, value: 0, started: 0, duration: 500 },
-      fade: { from: 0, to: 0, value: 0, started: 0, duration: 350 }, drawn: false, focused: false, dx: NaN, captionOpacity: '', captionPosition: '',
+      fade: { from: 0, to: 0, value: 0, started: 0, duration: 350 }, drawn: false, focused: false, dx: NaN, captionOpacity: '', captionPosition: '', cuePosition: '',
       flat: 0, lift: 0, stretch: [0, 0], disposeEvents: () => {} };
     const hoverTo = (value: number) => { card.hover = { ...card.hover, from: card.hover.value, to: value, started: lastTime || performance.now() }; dirty = true; };
     const enter = (event: PointerEvent) => {
@@ -280,7 +287,7 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
     event.preventDefault(); contextLost = true;
     bridge.cancel();
     section.classList.remove('ribbon-live');
-    cards.forEach(card => { card.element.classList.remove('is-gl'); card.caption.style.visibility = ''; card.caption.style.transform = ''; });
+    cards.forEach(card => { card.element.classList.remove('is-gl'); card.caption.style.visibility = ''; card.caption.style.transform = ''; card.cue.classList.remove('is-active'); });
     canvas.dataset.rendererError = 'WebGL context lost';
   };
   canvas.addEventListener('webglcontextlost', lost);
@@ -307,6 +314,7 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
         cards.forEach(card => {
           if (card.dx !== 0) { card.dx = 0; card.element.style.transform = ''; }
           if (settings.captionPinned) card.caption.style.visibility = 'hidden';
+          card.cue.classList.remove('is-active');
         });
         return;
       }
@@ -366,6 +374,13 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
         } else {
           card.caption.style.translate = `${Math.round(settings.diagonal * (card.base.height / 2 - 9))}px 0`;
         }
+        const cueActive = card.drawn && !held && (card.hover.to > 0 || focused);
+        card.cue.classList.toggle('is-active', cueActive);
+        if (cueActive) {
+          const point = projectPoint(card, .98, .12);
+          const transform = `translate3d(${clamp(point.x - 12, 235, width - 18).toFixed(1)}px,${clamp(point.y - 8, 50, height - 20).toFixed(1)}px,0)`;
+          if (transform !== card.cuePosition) { card.cuePosition = transform; card.cue.style.transform = transform; }
+        }
       });
       if (!dirty) return;
       gl.bindVertexArray(vao); gl.clear(gl.COLOR_BUFFER_BIT);
@@ -408,6 +423,7 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
       disposed = true; observer.disconnect(); removeEventListener('resize', resize); canvas.removeEventListener('webglcontextlost', lost);
       cards.forEach(card => {
         card.disposeEvents(); cancelVideo(card); card.element.style.transform = ''; card.element.classList.remove('is-gl');
+        card.cue.remove();
         card.caption.style.opacity = ''; card.caption.style.visibility = ''; card.caption.style.transform = ''; card.caption.style.translate = '';
       });
       section.classList.remove('ribbon-live', 'ribbon-mobile'); canvas.classList.remove('is-live');
@@ -441,6 +457,7 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
     open(id, dialog, figure, video) {
       const card = cards.find(item => item.element.dataset.projectId === id);
       if (!card?.poster || disposed || contextLost) return Promise.resolve(false);
+      cards.forEach(item => item.cue.classList.remove('is-active'));
       captureBackground(card);
       flight?.resolve?.(false);
       canvas.classList.add('ribbon-flight'); canvas.style.opacity = ''; dialog.append(canvas);
