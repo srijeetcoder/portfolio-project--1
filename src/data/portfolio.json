@@ -65,5 +65,11 @@
     "description": "A video editor portfolio for cinematic storytelling, thoughtful editing, colour, and sound. Explore selected work and the showreel.",
     "url": ""
   },
-  "projects": {}
+  "projects": {
+    "papon portfolio/FIRST.mp4": { "category": "Motion graphics", "posterTime": 0.69 },
+    "papon portfolio/SECOND.mp4": { "category": "Product videos", "posterTime": 10.06 },
+    "papon portfolio/THIRD.mp4": { "category": "Social reels", "posterTime": 9.16 },
+    "papon portfolio/FOURTH.mp4": { "category": "Product videos", "posterTime": 31.45 },
+    "papon portfolio/FIFTH.mp4": { "category": "Social reels", "posterTime": 1.07 }
+  }
 }
