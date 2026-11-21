@@ -49,7 +49,7 @@
   mix-blend-mode: soft-light; opacity: .13; will-change: transform;
   animation: loading-grain-drift 18s ease-in-out infinite; transition: opacity .45s;
 }
-.loading-visual.is-live .loading-grain { opacity: 0; }
+.loading-visual.is-live .loading-grain { opacity: 0; animation-play-state: paused; will-change: auto; }
 @keyframes loading-grain-drift {
   0%, 100% { transform: translate3d(-6px, 0, 0); }
   25% { transform: translate3d(8px, -9px, 0); }
@@ -363,7 +363,7 @@ img, video { max-width: 100%; }
 .video-dialog { --viewer-inset: 28px; padding: var(--viewer-inset) 40px; color: #fff2ec; color-scheme: dark; }
 
 .video-dialog::backdrop {
-  background: rgb(9 0 0 / 97%);
+  background: #090101;
   animation: viewer-backdrop-in .45s var(--ease-reveal) both;
 }
 .video-dialog.is-closing::backdrop { animation: viewer-backdrop-out var(--close-duration, 660ms) ease-in-out both; }
