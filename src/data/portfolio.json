@@ -1,8 +1,9 @@
 {
   "identity": {
-    "name": "[Your name]",
+    "name": "abhi.fx",
     "role": "Video editor",
-    "isPlaceholder": true
+    "isPlaceholder": false,
+    "logo": "/branding/abhi-fx-logo.svg"
   },
   "availability": {
     "status": "unknown",
@@ -13,7 +14,8 @@
       "EVERY FRAME.",
       "A FEELING."
     ],
-    "introduction": "I edit videos and shape stories with colour and sound."
+    "introduction": "I edit videos and shape stories with colour and sound.",
+    "wordmarkImage": "/branding/abhi-fx-wordmark.svg"
   },
   "about": {
     "headline": "Behind the cut.",
@@ -61,7 +63,7 @@
     "whatsapp": ""
   },
   "seo": {
-    "title": "Video Editor | Portfolio",
+    "title": "abhi.fx | Video Editor",
     "description": "A video editor portfolio for cinematic storytelling, thoughtful editing, colour, and sound. Explore selected work and the showreel.",
     "url": ""
   },
