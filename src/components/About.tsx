@@ -2,7 +2,7 @@ import { UserRound } from 'lucide-react';
 import { useRef } from 'react';
 import { portfolio, mediaUrl } from '../data/content';
 import { Reveal } from './Reveal';
-import { LiquidLede } from './LiquidText';
+import { DustLede } from './DustText';
 import { LineReveal } from './LineReveal';
 import { usePinnedScene } from '../lib/usePinnedScene';
 
@@ -18,14 +18,14 @@ export function About() {
       <div className="f-grid">
         <h2 id="about-title" className="sr-only">About me</h2>
         <div className="about-lede-wrap">
-          <LiquidLede className="f-lede" text={portfolio.about.biography} progress={scene.enabled ? scene.progress : undefined}>
+          <DustLede className="f-lede" text={portfolio.about.biography} progress={scene.enabled ? scene.progress : undefined}>
             <span className="f-w">I'm</span>{' '}<span className="f-w">{portfolio.identity.name}.</span>{' '}
             <span className="f-w f-face" role="img" aria-label={portfolio.about.photograph ? portfolio.identity.name : 'Profile photograph placeholder'}>
               {portfolio.about.photograph
                 ? <img className="f-face__img" src={mediaUrl(portfolio.about.photograph)} alt="" loading="lazy" width={120} height={120} />
                 : <UserRound size={52} strokeWidth={1.2} aria-hidden="true" />}
             </span>
-          </LiquidLede>
+          </DustLede>
           {portfolio.about.isPlaceholder && <p className="placeholder-note">Biography placeholder</p>}
         </div>
         <div className="f-about__body">

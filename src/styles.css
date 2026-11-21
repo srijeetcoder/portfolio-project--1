@@ -172,6 +172,9 @@ img, video { max-width: 100%; }
 .liquid-heading, .f-lede .f-w { --liquid-from: var(--red); }
 .f-rv__title.liquid-heading { --liquid-from: var(--liquid-pink, var(--red)); }
 .f-lede .f-w { display: inline-block; }
+.dust-text { position: relative; }
+.dust-field { position: absolute; max-width: none; pointer-events: none; z-index: 1; }
+.dust-text[data-dust-state="settled"] .f-w { will-change: auto; }
 .line-reveal__mask { display: block; overflow: clip; }
 .line-reveal__line { display: block; white-space: pre; }
 
