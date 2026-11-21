@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useInView, useReducedMotion } from 'motion/react';
 import { scrollRuntime } from '../lib/scrollRuntime';
 import { afterFirstPaint } from '../lib/afterFirstPaint';
+import { completeBootTask } from '../lib/bootRuntime';
 import type { GradientMount } from '../lib/GradientMount';
 
 export function ReferenceBackdrop({ kind }: { kind: 'hero' | 'closing' }) {
@@ -26,12 +27,14 @@ export function ReferenceBackdrop({ kind }: { kind: 'hero' | 'closing' }) {
         if (cancelled) return;
         const instance = await mountReferenceBackdrop(element!, kind,
           reduced.current || scrollRuntime.paused ? 0 : 0.8, controller.signal);
-        if (!instance) return;
+        if (!instance) { if (kind === 'hero') completeBootTask('background'); return; }
         if (cancelled) { instance.dispose(); return; }
         shader.current = instance;
         instance.setSpeed(reduced.current || scrollRuntime.paused ? 0 : 0.8);
         element!.classList.add('is-live');
+        if (kind === 'hero') completeBootTask('background');
       } catch {
+        if (!cancelled && kind === 'hero') completeBootTask('background');
         // The downloaded reference still provides the non-WebGL appearance.
       }
     }

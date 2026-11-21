@@ -32,36 +32,35 @@ export function SmoothScroll() {
   });
 
   useEffect(() => {
-    if (reduced) return;
-    const lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 1.1, touchMultiplier: 1.4,
+    const lenis = reduced ? null : new Lenis({ lerp: 0.09, wheelMultiplier: 1.1, touchMultiplier: 1.4,
       smoothWheel: true, syncTouch: false, anchors: true, autoRaf: false });
     controller.current = lenis;
-    scrollRuntime.smooth = true;
+    scrollRuntime.smooth = Boolean(lenis);
     scrollRuntime.lastY = window.scrollY;
-    lenis.raf(performance.now());
+    lenis?.raf(performance.now());
     const syncDialog = () => {
-      const paused = Boolean(document.querySelector('dialog[open]'));
+      const paused = Boolean(document.querySelector('dialog[open], [data-loader-active="true"]'));
       if (paused !== scrollRuntime.paused) {
         scrollRuntime.paused = paused;
         document.dispatchEvent(new Event('portfolio:motion-pause'));
       }
-      if (paused) lenis.stop();
-      else lenis.start();
+      if (paused) lenis?.stop();
+      else lenis?.start();
     };
     const observer = new MutationObserver(syncDialog);
-    observer.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['open'] });
+    observer.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['open', 'data-loader-active'] });
     const keyboard = (event: KeyboardEvent) => {
       if (!['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) return;
       const target = event.target as HTMLElement | null;
       if (scrollRuntime.paused || target?.closest('input, textarea, select, video, button, [contenteditable="true"]')) return;
-      if (lenis.isScrolling === 'smooth') { lenis.stop(); lenis.start(); }
+      if (lenis?.isScrolling === 'smooth') { lenis.stop(); lenis.start(); }
     };
     document.addEventListener('keydown', keyboard, { capture: true });
     syncDialog();
     return () => {
       observer.disconnect();
       document.removeEventListener('keydown', keyboard, { capture: true });
-      lenis.destroy();
+      lenis?.destroy();
       controller.current = null;
       scrollRuntime.smooth = false;
       scrollRuntime.lag = 0;

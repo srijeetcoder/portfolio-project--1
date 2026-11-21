@@ -8,6 +8,7 @@ import { Availability } from './Availability';
 import { ReferenceBackdrop } from './ReferenceBackdrop';
 import { RollContent } from './RollContent';
 import { usePinnedScene } from '../lib/usePinnedScene';
+import { usePortfolioReady } from '../lib/bootRuntime';
 import type { CSSProperties } from 'react';
 import type { Project } from '../types';
 
@@ -16,6 +17,7 @@ export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
   const heroRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
+  const loaded = usePortfolioReady();
   const scene = usePinnedScene(sceneRef, heroRef);
   const entrance = useMotionValue(0);
   const shot = useTransform(scene.progress, value => value * value * (3 - 2 * value));
@@ -38,9 +40,10 @@ export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
   }, [scene.progress]);
 
   useEffect(() => {
+    if (!loaded) return;
     const control = animate(entrance, 1, { duration: reduced ? 0 : 0.8, delay: reduced ? 0 : 0.2 });
     return () => control.stop();
-  }, [reduced, entrance]);
+  }, [reduced, entrance, loaded]);
 
   return (
     <section id="hero" className="scroll-scene hero-scroll-scene" ref={sceneRef} aria-labelledby="hero-title"
@@ -54,7 +57,7 @@ export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
             <ReferenceBackdrop kind="hero" />
           </div>
           <motion.div className="hero__logo-blend" aria-hidden="true"
-            initial={{ opacity: 0, y: -60 }} animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: -60 }} animate={{ opacity: loaded ? 1 : 0, y: loaded ? 0 : -60 }}
             transition={{ duration: reduced ? 0 : 1.1, ease: [0.11, 0.06, 0.18, 1] }}>
             <div className="hero__wordmark" />
           </motion.div>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { subscribeScrollFrame } from '../lib/scrollRuntime';
+import { completeBootTask } from '../lib/bootRuntime';
 import type { RibbonRenderer } from '../lib/ribbon/renderer';
 import type { RefObject } from 'react';
 
@@ -10,7 +11,7 @@ export function RibbonGallery({ section, signature }: { section: RefObject<HTMLE
   const [epoch, setEpoch] = useState(0);
   useEffect(() => subscribeScrollFrame((time, delta) => renderer.current?.frame(time, delta)), []);
   useEffect(() => {
-    if (reduced || !section.current) return;
+    if (reduced || !section.current) { completeBootTask('gallery'); return; }
     const parent = section.current;
     const canvas = document.createElement('canvas');
     canvas.className = 'ribbon-canvas';
@@ -42,8 +43,12 @@ export function RibbonGallery({ section, signature }: { section: RefObject<HTMLE
         const instance = await createRibbonRenderer(canvas, parent, controller.signal);
         if (cancelled) { instance.dispose(); return; }
         renderer.current = instance;
+        completeBootTask('gallery');
       }
-      catch (error) { canvas.dataset.rendererError = error instanceof Error ? error.message : 'Renderer unavailable'; }
+      catch (error) {
+        canvas.dataset.rendererError = error instanceof Error ? error.message : 'Renderer unavailable';
+        if (!cancelled) completeBootTask('gallery');
+      }
     });
     return () => { cancelled = true; replacements.disconnect(); controller.abort(); canvas.removeEventListener('webglcontextrestored', restored); renderer.current?.dispose(); renderer.current = null; canvas.remove(); };
   }, [section, signature, reduced, epoch]);

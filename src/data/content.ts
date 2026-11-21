@@ -54,7 +54,8 @@ export const projects: Project[] = mediaLibrary.projects.length
 
 export const showreel: Project = mediaLibrary.showreel
   ? { ...enrichProject(mediaLibrary.showreel), title: 'Showreel', description: '', category: 'Showreel', categoryId: 'showreel' }
-  : mediaLibrary.projects.length ? { ...enrichProject(mediaLibrary.projects[0]), category: 'Featured edit', description: '' }
+  : mediaLibrary.projects.length ? { ...enrichProject(mediaLibrary.projects[0]), id: 'showreel-' + mediaLibrary.projects[0].id,
+      category: 'Featured edit', description: '' }
   : {
       id: 'showreel-placeholder',
       file: '',
