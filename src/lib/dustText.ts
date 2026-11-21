@@ -45,6 +45,7 @@ export async function mountDustText(root: HTMLElement, signal: AbortSignal): Pro
   const originalFaceOpacity = face?.style.opacity || '';
   let particles: Particle[] = [], progress = 0, disposed = false, visible = false, settled = false;
   let width = 1, height = 1, ratio = 1, lastTime = 0, elapsed = 0, layoutKey = '';
+  let stopActivity = () => {};
   let seed = 2166136261;
   for (const character of root.textContent || '') seed = Math.imul(seed ^ character.charCodeAt(0), 16777619);
   const random = () => {
@@ -59,14 +60,18 @@ export async function mountDustText(root: HTMLElement, signal: AbortSignal): Pro
     word.opacity = value; word.element.style.opacity = value.toFixed(3);
   }
   function finish() {
+    if (settled) return;
     settled = true;
     words.forEach(word => wordOpacity(word, 1));
     if (face) face.style.opacity = '1';
     context!.clearRect(0, 0, width, height);
     root.dataset.dustState = 'settled';
+    particles = []; canvas.width = canvas.height = 1;
+    canvas.dataset.particleCount = '0';
+    stopActivity();
   }
   function measure() {
-    if (disposed) return;
+    if (disposed || settled) return;
     const bounds = root.getBoundingClientRect();
     const measurements = words.map(word => ({ box: word.element.getBoundingClientRect(), style: getComputedStyle(word.element) }));
     const nextLayout = [innerWidth, devicePixelRatio, root.offsetHeight, bounds.left,
@@ -169,16 +174,20 @@ export async function mountDustText(root: HTMLElement, signal: AbortSignal): Pro
   intersection.observe(root);
   const resize = new ResizeObserver(measure);
   resize.observe(root); words.forEach(word => resize.observe(word.element));
+  stopActivity = () => { unsubscribe(); intersection.disconnect(); resize.disconnect(); };
   measure();
   return {
     setProgress(value) {
-      progress = Math.max(progress, clamp(value));
+      if (settled || disposed) return;
+      const next = Math.max(progress, clamp(value));
+      if (next === progress) return;
+      progress = next;
       root.dataset.dustProgress = progress.toFixed(3);
       if (progress >= .98) finish();
       else render(lastTime || performance.now(), 0);
     },
     dispose() {
-      disposed = true; unsubscribe(); intersection.disconnect(); resize.disconnect(); canvas.remove();
+      disposed = true; stopActivity(); canvas.remove();
       words.forEach(word => { word.element.style.opacity = word.originalOpacity; });
       if (face) face.style.opacity = originalFaceOpacity;
       delete root.dataset.dustState; delete root.dataset.dustProgress;
