@@ -491,6 +491,10 @@ img, video { max-width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   [data-reveal], .hero__logo-blend, .hero-copy { opacity: 1 !important; transform: none !important; }
+  .media-panel-button { clip-path: none !important; }
+  .media-parallax, .media-hover-zoom, .media-panel img, .service-title, .line-reveal__line { transform: none !important; }
+  .media-caption, .service-toggle { opacity: 1 !important; }
+  .service-item::after { transform: scaleX(1) !important; }
   *, *::before, *::after {
     animation-duration: .01ms !important; animation-iteration-count: 1 !important;
     transition-duration: .01ms !important; scroll-behavior: auto !important;

@@ -28,20 +28,20 @@ export function MediaPanel({ item, onPlay, hero = false }: {
         transition={{ duration: reduced ? 0 : revealTiming.figure.duration, ease: easeOutExpo }}>
         <motion.span className="media-parallax" style={{ y: imageY }} aria-hidden="true">
           <span className="media-hover-zoom">
-        <motion.img
-          src={poster}
-          srcSet={item.posterSources?.map(source => mediaUrl(source.src) + ' ' + source.width + 'w').join(', ')}
-          sizes="(max-width: 809px) calc(100vw - 40px), 72vw"
-          alt={item.isPlaceholder ? 'Red grain artwork for the upcoming showreel' : 'Showreel poster'}
-          width={item.width || 1800}
-          height={item.height || 1200}
-          loading={hero ? 'eager' : 'lazy'}
-          fetchPriority={hero ? 'high' : 'auto'}
-          decoding="async"
-          initial={reduced ? false : { y: revealTiming.figure.travel, scale: revealTiming.figure.scale }}
-          animate={{ y: visible ? '0%' : revealTiming.figure.travel, scale: visible ? 1 : revealTiming.figure.scale }}
-          transition={{ duration: reduced ? 0 : revealTiming.figure.duration, ease: easeOutExpo }}
-        />
+            <motion.img
+              src={poster}
+              srcSet={item.posterSources?.map(source => mediaUrl(source.src) + ' ' + source.width + 'w').join(', ')}
+              sizes="(max-width: 809px) calc(100vw - 40px), 72vw"
+              alt={item.isPlaceholder ? 'Red grain artwork for the upcoming showreel' : 'Showreel poster'}
+              width={item.width || 1800}
+              height={item.height || 1200}
+              loading={hero ? 'eager' : 'lazy'}
+              fetchPriority={hero ? 'high' : 'auto'}
+              decoding="async"
+              initial={reduced ? false : { y: revealTiming.figure.travel, scale: revealTiming.figure.scale }}
+              animate={{ y: visible ? '0%' : revealTiming.figure.travel, scale: visible ? 1 : revealTiming.figure.scale }}
+              transition={{ duration: reduced ? 0 : revealTiming.figure.duration, ease: easeOutExpo }}
+            />
           </span>
         </motion.span>
         <span className="media-shade" aria-hidden="true" />

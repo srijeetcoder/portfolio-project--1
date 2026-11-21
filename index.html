@@ -15,6 +15,14 @@
     <link rel="preload" href="/reference/fonts/early-sans.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/reference/images/reference-hero.webp" as="image" fetchpriority="high" />
     <title>Video Editor | Portfolio</title>
+    <noscript>
+      <style>
+        [data-reveal], .hero__logo-blend, .hero-copy, .media-caption, .service-toggle { opacity: 1 !important; transform: none !important; }
+        .media-panel-button { clip-path: none !important; }
+        .media-parallax, .media-hover-zoom, .media-panel img, .service-title { transform: none !important; }
+        .service-item::after { transform: scaleX(1) !important; }
+      </style>
+    </noscript>
     <script type="module">
       import { prewarmRibbon } from '/src/lib/ribbon/warmup.ts';
       void prewarmRibbon();
