@@ -2,7 +2,7 @@
 
 A complete React, TypeScript, and Vite portfolio adapted to the visual layout of [melon.studio](https://melon.studio/). It includes the red grain background, oversized Le Kick wordmark, Early Sans typography, floating navigation, liquid text reveals, perspective project rail, light About section, and the reference's contact and footer composition.
 
-The site is ready for the owner's footage. No original portfolio videos have been supplied yet. Seven compressed reference images are clearly labeled as layout previews; they are replaced automatically when actual projects are added. The editor branding, biography, services, software, testimonials, availability, and contact details are editable placeholders. The reference owner's identity, biography, clients, and reviews are not used as portfolio content.
+Five owner-supplied videos are integrated from `videos/papon portfolio/` in the requested order: `FIRST.mp4`, `SECOND.mp4`, `THIRD.mp4`, `FOURTH.mp4`, `FIFTH.mp4`. The gallery preserves portrait and landscape formats and uses selected, compressed video-frame posters. Six-second muted previews are generated separately; expanded playback uses the original files. FIRST serves as the temporary showreel until a dedicated reel is supplied. The editor branding, biography, services, software, testimonials, availability, and contact details remain editable placeholders. The reference owner's identity, biography, clients, and reviews are not used as portfolio content.
 
 ## Run locally
 
@@ -123,6 +123,8 @@ Actual filenames identify projects until custom metadata is supplied. For a port
 
 ## Design and reference assets
 
+The loading screen renders a rotating black marble in a gray studio environment with procedural stone veining, reflected lights, and a soft floor shadow. Its bottom-right percentage reflects weighted readiness milestones for fonts, poster decoding, Motion, the background, gallery, and marble renderer. Matching desktop and phone artwork, rendered from the same shader, covers initialization and unsupported WebGL devices. Reduced motion keeps the marble still. The completed loader fades into the opening, then restores scrolling and keyboard access.
+
 The original downloaded archive in `references/` is preserved. Selected styles are copied to `reference/css/`, with local asset paths adapted for the portfolio. The original font kit's URLs were used to recover the actual Early Sans and Le Kick font files; the frontend serves them locally.
 
 The grain gradient uses the reference's Paper shaders, with a local texture fallback. The hero poster is an eagerly loaded image in the prerendered HTML. GPU preparation begins after the first contentful paint so the artwork reaches the screen before the shader driver initializes. Background setup loads separately from page hydration, and its shader compiles asynchronously and renders in an OffscreenCanvas worker where supported. The reference colours are stored as their exact sRGB bytes, avoiding runtime canvas readbacks. Its liquid text effect uses the reference's blur, alpha threshold, and scroll curves. The project rail renders the recovered surface shader in native WebGL 2, including its camera, lighting, cursor dents, and movement that responds to scroll speed. A worker prepares the driver's shader cache before the gallery initializes, and poster pixels are prepared asynchronously. The image carries into the expanded viewer and returns to the gallery on close.
@@ -135,7 +137,7 @@ The design follows the supplied reference: `DESIGN_VARIANCE: 8`, `MOTION_INTENSI
 
 ## Playback, responsiveness, and accessibility
 
-Project cards initially load compressed posters. Mouse hover requests a muted preview after a short delay. Only one preview can play at a time. Leaving the card, moving it out of view, changing browser tabs, or opening the expanded player stops the preview and releases its source. Reduced motion and data-saving preferences suppress hover previews.
+Project cards initially load compressed posters. Mouse hover requests a generated, muted preview after a short delay. Only one preview can play at a time. Leaving the card, moving it out of view, changing browser tabs, or opening the expanded player stops the preview and releases its source. Reduced motion and data-saving preferences suppress hover previews. Preview files remain in `videos/.previews/` locally and are copied to `dist/previews/` for a static production build. Original videos remain unchanged. Ordinal filenames are sorted before other filenames, and the selected `posterTime` for each clip is configurable in `src/data/portfolio.json`.
 
 The lazy-loaded video dialog uses native playback controls, starts muted, supports seeking and keyboard dismissal, and restores focus when closed. Its surface transition carries the project image into the player and back; background motion pauses while the viewer is open. Mobile playback is inline. Empty-media and playback-error states are included.
 
