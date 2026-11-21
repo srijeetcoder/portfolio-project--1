@@ -45,8 +45,8 @@ body { min-width: 320px; }
 .page-tone { position: fixed; inset: 0; background: var(--f-bg); z-index: 0; pointer-events: none; }
 main { position: relative; z-index: 1; }
 .site-footer { position: relative; z-index: 1; }
-html.scene-transitions [data-tone] { background: transparent; }
-html.scene-transitions [data-tone="white"] { --f-bg: inherit; --f-fg: inherit; --f-fg2: inherit; --f-rule: inherit; }
+html.scene-transitions [data-tone] { background: transparent; --f-bg: inherit; --f-fg: inherit; --f-fg2: inherit; --f-rule: inherit; }
+html.lenis.lenis-smooth { scroll-behavior: auto !important; }
 button, input, textarea { font: inherit; }
 button { cursor: pointer; }
 button:disabled { cursor: default; }

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { useMotionValueEvent, useReducedMotion, useScroll } from 'motion/react';
+import { useReducedMotion } from 'motion/react';
+import { scrollRuntime, subscribeScrollFrame } from '../lib/scrollRuntime';
 
 type RGB = [number, number, number];
 const clamp = (x: number) => Math.min(1, Math.max(0, x));
@@ -46,16 +47,17 @@ function createPalette() {
 }
 
 export function SceneTransitions() {
-  const { scrollY } = useScroll();
   const reduced = useReducedMotion();
   const update = useRef<(position: number) => void>(() => {});
-  useMotionValueEvent(scrollY, 'change', position => update.current(position));
+  useEffect(() => subscribeScrollFrame(() => update.current(scrollRuntime.y)), []);
   useEffect(() => {
-    const about = document.getElementById('about'), closing = document.querySelector<HTMLElement>('.closing-region');
+    const about = document.getElementById('about'), services = document.getElementById('services');
+    const showreel = document.getElementById('showreel'), closing = document.querySelector<HTMLElement>('.closing-region');
     const main = document.querySelector('main');
-    if (!about || !closing || !main) return;
+    if (!about || !services || !showreel || !closing || !main) return;
     const palette = createPalette();
-    let bands = [[0, 1], [0, 1]], phone = false, last = -1;
+    const targets = [1, 0, 1, 0];
+    let bands: number[][] = [], phone = false, last = -1;
     const progress = (position: number, [start, end]: number[]) => {
       const raw = clamp((position - start) / (end - start));
       if (reduced) return raw >= 0.5 ? 1 : 0;
@@ -65,7 +67,14 @@ export function SceneTransitions() {
       return (1 - Math.cos(Math.PI * smooth)) / 2;
     };
     update.current = position => {
-      const value = progress(position, bands[0]) * (1 - progress(position, bands[1]));
+      let value = 0;
+      for (let index = 0; index < bands.length; index++) {
+        if (position < bands[index][0]) break;
+        const p = progress(position, bands[index]);
+        value += (targets[index] - value) * p;
+        if (position < bands[index][1]) break;
+        value = targets[index];
+      }
       const index = Math.round(value * 255);
       if (index === last) return;
       last = index;
@@ -77,9 +86,12 @@ export function SceneTransitions() {
     const measure = () => {
       phone = innerWidth <= 809.98;
       const halfBand = (phone ? 0.85 : 0.6) / 2;
-      bands = [about, closing].map(section => {
+      const limit = Math.max(0, document.documentElement.scrollHeight - innerHeight);
+      bands = [about, services, showreel, closing].map(section => {
         const top = section.getBoundingClientRect().top + window.scrollY;
-        return [top - innerHeight * (0.48 + halfBand), top - innerHeight * (0.48 - halfBand)];
+        let start = top - innerHeight * (0.48 + halfBand), end = top - innerHeight * (0.48 - halfBand);
+        if (end > limit) { start -= end - limit; end = limit; }
+        return [start, end];
       });
       last = -1;
       update.current(window.scrollY);
@@ -95,6 +107,6 @@ export function SceneTransitions() {
       delete document.documentElement.dataset.sceneTone;
       for (const name of ['--f-bg', '--f-fg', '--f-fg2', '--f-rule', '--f-inv']) document.body.style.removeProperty(name);
     };
-  }, [scrollY, reduced]);
+  }, [reduced]);
   return <div className="page-tone" aria-hidden="true" />;
 }

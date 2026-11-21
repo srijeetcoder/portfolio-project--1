@@ -5,7 +5,7 @@ import { LiquidHeading } from './LiquidText';
 
 export function Services() {
   return (
-    <section id="services" className="f-sec services-section chapter-section" data-tone="white" aria-labelledby="services-title">
+    <section id="services" className="f-sec services-section chapter-section" data-tone="black" aria-labelledby="services-title">
       <div className="f-grid">
         <Reveal className="services-intro">
           <LiquidHeading id="services-title" className="f-title">Services</LiquidHeading>

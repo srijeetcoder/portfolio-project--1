@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { useAnimationFrame, useReducedMotion } from 'motion/react';
+import { useReducedMotion } from 'motion/react';
+import { subscribeScrollFrame } from '../lib/scrollRuntime';
 import type { RibbonRenderer } from '../lib/ribbon/renderer';
 import type { RefObject } from 'react';
 
@@ -7,7 +8,7 @@ export function RibbonGallery({ section, signature }: { section: RefObject<HTMLE
   const renderer = useRef<RibbonRenderer | null>(null);
   const reduced = useReducedMotion();
   const [epoch, setEpoch] = useState(0);
-  useAnimationFrame((time, delta) => renderer.current?.frame(time, delta));
+  useEffect(() => subscribeScrollFrame((time, delta) => renderer.current?.frame(time, delta)), []);
   useEffect(() => {
     if (reduced || !section.current) return;
     const parent = section.current;

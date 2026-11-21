@@ -2,12 +2,20 @@ import { useEffect, useRef } from 'react';
 import { useAnimationFrame, useReducedMotion } from 'motion/react';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
-import { scrollRuntime } from '../lib/scrollRuntime';
+import { emitScrollFrame, scrollRuntime } from '../lib/scrollRuntime';
 
 export function SmoothScroll() {
   const reduced = useReducedMotion();
   const controller = useRef<Lenis | null>(null);
-  useAnimationFrame(time => controller.current?.raf(time));
+  useAnimationFrame((_time, delta) => {
+    const time = performance.now();
+    const lenis = controller.current;
+    lenis?.raf(time);
+    const smooth = lenis?.isScrolling === 'smooth';
+    emitScrollFrame(time, delta, smooth ? lenis.animatedScroll : window.scrollY,
+      smooth ? lenis.targetScroll - lenis.animatedScroll : null, Boolean(reduced));
+    document.documentElement.dataset.scrollMode = scrollRuntime.paused ? 'paused' : smooth ? 'smooth' : 'native';
+  });
 
   useEffect(() => {
     if (reduced) return;
@@ -15,10 +23,8 @@ export function SmoothScroll() {
       smoothWheel: true, syncTouch: false, anchors: true, autoRaf: false });
     controller.current = lenis;
     scrollRuntime.smooth = true;
-    const stop = lenis.on('scroll', state => {
-      scrollRuntime.y = state.animatedScroll;
-      scrollRuntime.lag = state.targetScroll - state.animatedScroll;
-    });
+    scrollRuntime.lastY = window.scrollY;
+    lenis.raf(performance.now());
     const syncDialog = () => {
       const paused = Boolean(document.querySelector('dialog[open]'));
       if (paused !== scrollRuntime.paused) {
@@ -41,12 +47,14 @@ export function SmoothScroll() {
     return () => {
       observer.disconnect();
       document.removeEventListener('keydown', keyboard, { capture: true });
-      stop();
       lenis.destroy();
       controller.current = null;
       scrollRuntime.smooth = false;
       scrollRuntime.lag = 0;
+      scrollRuntime.velocity = 0;
+      scrollRuntime.lastY = null;
       scrollRuntime.paused = false;
+      delete document.documentElement.dataset.scrollMode;
       document.dispatchEvent(new Event('portfolio:motion-pause'));
     };
   }, [reduced]);
