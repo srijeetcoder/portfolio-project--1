@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useInView, useMotionValueEvent, useReducedMotion, useScroll } from 'motion/react';
 import type { ReactNode, RefObject } from 'react';
 
@@ -10,7 +10,14 @@ let filterSequence = 0;
 function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false) {
   const reduced = useReducedMotion();
   const nearby = useInView(target, { margin: '500px 0px', once: true });
-  const phone = typeof window !== 'undefined' && window.matchMedia('(max-width: 809.98px)').matches;
+  const [phone, setPhone] = useState(false);
+  useEffect(() => {
+    const query = matchMedia('(max-width: 809.98px)');
+    const change = () => setPhone(query.matches);
+    change();
+    query.addEventListener('change', change);
+    return () => query.removeEventListener('change', change);
+  }, []);
   const { scrollYProgress } = useScroll({
     target,
     offset: words
@@ -58,6 +65,7 @@ function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false) {
         const radius = amount < 0.25 ? 0 : amount;
         if (record.last >= 0 && Math.abs(radius - record.last) < 0.25 && radius !== 0) return;
         record.last = radius;
+        record.element.style.setProperty('--liquid', radius.toFixed(2));
         if (radius === 0) {
           record.element.style.filter = record.originalFilter;
           record.element.style.color = record.originalColor;
@@ -101,6 +109,7 @@ function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false) {
       records.forEach(record => {
         record.element.style.filter = record.originalFilter;
         record.element.style.color = record.originalColor;
+        record.element.style.removeProperty('--liquid');
       });
     };
   }, [target, reduced, words, scrollYProgress, nearby]);
