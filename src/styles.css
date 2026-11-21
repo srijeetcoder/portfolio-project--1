@@ -594,14 +594,21 @@ img, video { max-width: 100%; }
 }
 @media (max-height: 500px) {
   .video-dialog { --viewer-inset: 12px; --viewer-gutter: 24px; }
-  .player-header { padding-bottom: 8px; min-height: 44px; }
+  .player-shell { grid-template-rows: minmax(0, 1fr); }
+  .player-header { position: absolute; left: 0; right: 0; top: 0; padding-bottom: 8px; min-height: 44px; background: linear-gradient(#090101e6, #09010100); }
   .player-header h2 { font-size: 20px; }
   .player-header p { font-size: 10px; margin-top: 3px; }
   .player-close { width: 36px; height: 36px; }
-  .player-controls { padding-top: 2px; }
+  .player-controls { position: absolute; left: 0; right: 0; bottom: 20px; padding-top: 2px; }
+  .player-controls::before { content: ''; position: absolute; z-index: -1; inset: -16px 0 -22px; background: linear-gradient(#09010100, #090101f5 80%); pointer-events: none; }
   .player-seek, .player-seek input { height: 22px; }
-  .player-description { padding-top: 2px; font-size: 10px; }
+  .player-description { position: absolute; left: 0; right: 0; bottom: 0; z-index: 7; padding-top: 2px; font-size: 10px; }
+  .player-center-play { width: 56px; height: 56px; }
+  .player-shell:fullscreen .player-header { top: var(--viewer-inset); left: var(--viewer-gutter); right: var(--viewer-gutter); }
+  .player-shell:fullscreen .player-controls { bottom: calc(var(--viewer-inset) + 20px); left: var(--viewer-gutter); right: var(--viewer-gutter); }
+  .player-shell:fullscreen .player-description { bottom: var(--viewer-inset); left: var(--viewer-gutter); right: var(--viewer-gutter); }
 }
+@media (hover: none) { .player-volume { display: none; } }
 @media (min-width: 810px) and (max-height: 700px) {
   .hero {
     --wm-top: calc(.8vh - max(0px, 32.4vw - 70svh));
