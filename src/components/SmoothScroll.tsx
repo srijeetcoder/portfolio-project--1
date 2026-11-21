@@ -32,7 +32,7 @@ export function SmoothScroll() {
   });
 
   useEffect(() => {
-    const lenis = reduced ? null : new Lenis({ lerp: 0.09, wheelMultiplier: 1.1, touchMultiplier: 1.4,
+    const lenis = reduced ? null : new Lenis({ lerp: 0.1, wheelMultiplier: 1.1, touchMultiplier: 1.4,
       smoothWheel: true, syncTouch: false, anchors: true, autoRaf: false });
     controller.current = lenis;
     scrollRuntime.smooth = Boolean(lenis);

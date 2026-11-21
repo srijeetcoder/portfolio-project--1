@@ -44,7 +44,7 @@ export default function App() {
       <Footer />
       {selectedProject && (
         <Suspense fallback={
-          <div className="player-loading" role="status">
+          <div className="player-loading" role="status" data-loader-active="true">
             <LoaderCircle className="loading-spinner" size={22} aria-hidden="true" />
             Opening player...
           </div>

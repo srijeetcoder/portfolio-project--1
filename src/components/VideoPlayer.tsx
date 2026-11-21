@@ -1,9 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { Film, LoaderCircle, RotateCcw, X } from 'lucide-react';
+import { Film, LoaderCircle, Play, RotateCcw, X } from 'lucide-react';
 import { mediaUrl } from '../data/content';
 import { visuals } from '../data/visuals';
 import { useReducedMotion } from 'motion/react';
 import { ribbonBridge } from '../lib/ribbon/bridge';
+import { PlayerControls } from './PlayerControls';
 import type { Project } from '../types';
 
 export default function VideoPlayer({ project, onClose }: { project: Project; onClose: () => void }) {
@@ -63,14 +64,19 @@ export default function VideoPlayer({ project, onClose }: { project: Project; on
   function requestClose() {
     if (closingRef.current) return;
     closingRef.current = true;
+    if (dialogRef.current) dialogRef.current.dataset.playbackClosing = 'true';
     videoRef.current?.pause();
-    setClosing(true);
-    const bridge = ribbonBridge.current;
-    const native = !reduced && bridge?.holding(project.id);
-    dialogRef.current?.style.setProperty('--close-duration', native ? '660ms' : reduced ? '0ms' : '180ms');
-    if (native) void bridge!.close(project.id).then(onClose);
-    else if (reduced) onClose();
-    else closeTimer.current = setTimeout(onClose, 180);
+    const close = () => {
+      setClosing(true);
+      const bridge = ribbonBridge.current;
+      const native = !reduced && bridge?.holding(project.id);
+      dialogRef.current?.style.setProperty('--close-duration', native ? '660ms' : reduced ? '0ms' : '340ms');
+      if (native) void bridge!.close(project.id).then(onClose);
+      else if (reduced) onClose();
+      else closeTimer.current = setTimeout(onClose, 340);
+    };
+    if (document.fullscreenElement === dialogRef.current) void document.exitFullscreen().catch(() => {}).then(close);
+    else close();
   }
 
   function retry() {
@@ -78,6 +84,7 @@ export default function VideoPlayer({ project, onClose }: { project: Project; on
     setError(false);
     setLoading(true);
     videoRef.current?.load();
+    void videoRef.current?.play().catch(() => {});
   }
 
   function sourceFailed(src: string) {
@@ -102,8 +109,10 @@ export default function VideoPlayer({ project, onClose }: { project: Project; on
             <h2 id={titleId}>{project.title}</h2>
             <p>{project.isPlaceholder ? 'Layout preview' : project.category}{project.year ? ' / ' + project.year : ''}</p>
           </div>
-          <button className="icon-button" onClick={requestClose} autoFocus aria-label="Close video player">
-            <X size={24} strokeWidth={1.5} aria-hidden="true" />
+          <button className="player-close" onClick={requestClose} autoFocus aria-label="Close video player">
+            <span className="player-close-halo" aria-hidden="true" />
+            <span className="player-close-orbit" aria-hidden="true" />
+            <X size={22} strokeWidth={1.2} aria-hidden="true" />
           </button>
         </div>
         {project.isPlaceholder ? (
@@ -116,7 +125,17 @@ export default function VideoPlayer({ project, onClose }: { project: Project; on
         ) : (
           <>
             <div className="player-video-wrap" ref={figureRef}>
-              <video ref={videoRef} className="player-video" controls autoPlay muted playsInline preload="metadata" poster={poster}
+              <video ref={videoRef} className="player-video" autoPlay muted playsInline preload="metadata" poster={poster}
+                aria-label={project.title} tabIndex={-1}
+                onClick={event => {
+                  const video = event.currentTarget, box = video.getBoundingClientRect();
+                  const ratio = video.videoWidth && video.videoHeight ? video.videoWidth / video.videoHeight : 16 / 9;
+                  const width = Math.min(box.width, box.height * ratio), height = width / ratio;
+                  if (event.clientX < box.left + (box.width - width) / 2 || event.clientX > box.right - (box.width - width) / 2
+                    || event.clientY < box.top + (box.height - height) / 2 || event.clientY > box.bottom - (box.height - height) / 2) { requestClose(); return; }
+                  if (video.paused || video.ended) { if (video.ended) video.currentTime = 0; void video.play().catch(() => {}); }
+                  else video.pause();
+                }}
                 onCanPlay={() => setLoading(false)} onPlaying={() => setLoading(false)}
                 onWaiting={() => setLoading(true)} onPause={() => setLoading(false)}
                 onError={event => {
@@ -131,6 +150,12 @@ export default function VideoPlayer({ project, onClose }: { project: Project; on
                 ))}
                 Your browser does not support this video.
               </video>
+              <button className="player-center-play" onClick={() => void videoRef.current?.play().catch(() => {})} aria-label="Resume video" tabIndex={-1}>
+                <Play size={30} fill="currentColor" strokeWidth={0} aria-hidden="true" />
+              </button>
+              <div className="playback-status" role="status">
+                {loading && !error && <><LoaderCircle className="loading-spinner" size={18} aria-hidden="true" /><span className="sr-only">Loading video</span></>}
+              </div>
               {error && (
                 <div className="player-error" role="alert">
                   <h3>The video could not be played.</h3>
@@ -141,9 +166,7 @@ export default function VideoPlayer({ project, onClose }: { project: Project; on
                 </div>
               )}
             </div>
-            <div className="playback-status" role="status">
-              {loading && <><LoaderCircle className="loading-spinner" size={15} aria-hidden="true" /> Loading video...</>}
-            </div>
+            <PlayerControls videoRef={videoRef} dialogRef={dialogRef} disabled={error} />
           </>
         )}
         {!project.isPlaceholder && project.description && <p className="player-description">{project.description}</p>}
