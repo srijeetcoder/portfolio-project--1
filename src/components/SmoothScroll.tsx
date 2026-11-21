@@ -13,9 +13,16 @@ export function SmoothScroll() {
     // Hash changes, keyboard navigation and native scrollbar jumps can land
     // between Lenis' own scroll events. Adopt their position before another
     // wheel gesture so its target starts from the visible section.
-    if (lenis && lenis.isScrolling !== 'smooth' && !scrollRuntime.paused) {
-      lenis.animatedScroll = window.scrollY;
-      lenis.targetScroll = window.scrollY;
+    if (lenis && !scrollRuntime.paused) {
+      const visible = window.scrollY;
+      if (lenis.isScrolling === 'smooth' && Math.abs(visible - lenis.animatedScroll) > 2) {
+        lenis.stop();
+        lenis.start();
+      }
+      if (lenis.isScrolling !== 'smooth') {
+        lenis.animatedScroll = visible;
+        lenis.targetScroll = visible;
+      }
     }
     lenis?.raf(time);
     const smooth = lenis?.isScrolling === 'smooth';
