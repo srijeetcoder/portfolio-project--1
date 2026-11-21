@@ -45,12 +45,12 @@ vec3 studio(vec3 r) {
 }
 vec3 stone(vec3 p, vec3 n, vec3 rd) {
   vec3 q = turn(u_time * .63 + .38) * p;
-  float warp = fbm(q * 3.1);
-  float line = abs(sin(q.y * 3.8 + q.x * 1.5 + warp * 7.6));
-  float vein = pow(1. - smoothstep(.005, .115, line), 2.2);
+  float warp = fbm(q * vec3(2.6, 2.1, 2.4));
+  float line = abs(sin(q.x * 3.4 + q.y * 1.6 + q.z * .85 + warp * 4.2));
+  float vein = pow(1. - smoothstep(.005, .095, line), 2.2);
   float cloud = fbm(q * 6.4 + 1.3);
-  vec3 base = mix(vec3(.009,.010,.012), vec3(.028,.030,.033), cloud);
-  base = mix(base, vec3(.24,.25,.265), vein * .72);
+  vec3 base = mix(vec3(.004,.005,.006), vec3(.018,.020,.023), cloud);
+  base = mix(base, vec3(.24,.25,.265), vein * .64);
   vec3 light = normalize(vec3(-.6, 1.1, 1.8));
   float diffuse = .25 + .75 * max(dot(n, light), 0.);
   float facing = max(dot(n, -rd), 0.);
