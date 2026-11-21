@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Play } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { useInView, useReducedMotion } from 'motion/react';
 import { mediaUrl, projects } from '../data/content';
 import { visuals } from '../data/visuals';
@@ -83,13 +83,17 @@ function ProjectCard({ project, activePreview, onPreview, onPlay }: {
                 <source key={source.src} src={mediaUrl(source.src)} type={source.type} />)}
             </video>
           )}
-          <span className="project-hover-play" aria-hidden="true"><Play size={22} fill="currentColor" strokeWidth={0} /></span>
+          <span className="project-play-cue" aria-hidden="true">
+            <span className="project-cue-label">Click to play video</span>
+            <span className="project-cue-arrow"><ArrowUpRight size={19} strokeWidth={1.3} /></span>
+          </span>
         </span>
       </button>
       <div className="proj__cap project-caption">
         <h3 className="proj__title project-title">{project.title}</h3>
-        <p className="proj__kind project-category">{project.category}{project.year ? ', ' + project.year : ''}</p>
         {project.description && <p className="project-description">{project.description}</p>}
+        <p className="proj__kind project-category">{project.category}{project.year ? ', ' + project.year : ''}</p>
+        <span className="project-touch-cue" aria-hidden="true">Tap to play video <ArrowUpRight size={14} strokeWidth={1.3} /></span>
       </div>
     </article>
   );

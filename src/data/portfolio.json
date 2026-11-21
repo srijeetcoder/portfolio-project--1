@@ -66,10 +66,30 @@
     "url": ""
   },
   "projects": {
-    "papon portfolio/FIRST.mp4": { "category": "Motion graphics", "posterTime": 0.69 },
-    "papon portfolio/SECOND.mp4": { "category": "Product videos", "posterTime": 10.06 },
-    "papon portfolio/THIRD.mp4": { "category": "Social reels", "posterTime": 9.16 },
-    "papon portfolio/FOURTH.mp4": { "category": "Product videos", "posterTime": 31.45 },
-    "papon portfolio/FIFTH.mp4": { "category": "Social reels", "posterTime": 1.07 }
+    "papon portfolio/FIRST.mp4": {
+      "title": "Liquid Death: Unforgettable",
+      "description": "A monochrome motion study of the branding behind Liquid Death.",
+      "category": "Motion graphics", "posterTime": 0.69
+    },
+    "papon portfolio/SECOND.mp4": {
+      "title": "OfficeMoM: Meetings into Action",
+      "description": "A product walkthrough of meeting notes, transcripts and AI summaries.",
+      "category": "Product videos", "posterTime": 10.06
+    },
+    "papon portfolio/THIRD.mp4": {
+      "title": "Beyond the Ad",
+      "description": "A captioned reel on landing pages and the experience behind conversion.",
+      "category": "Social reels", "posterTime": 9.16
+    },
+    "papon portfolio/FOURTH.mp4": {
+      "title": "Admoji: Connected by Motion",
+      "description": "An animated product introduction linking reach, affiliates and automation.",
+      "category": "Product videos", "posterTime": 31.45
+    },
+    "papon portfolio/FIFTH.mp4": {
+      "title": "The Work Behind the Hustle",
+      "description": "A subtitled talking-head edit on the time it takes to build a business.",
+      "category": "Social reels", "posterTime": 1.07
+    }
   }
 }

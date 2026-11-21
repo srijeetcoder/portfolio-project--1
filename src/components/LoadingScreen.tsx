@@ -68,7 +68,7 @@ export function LoadingScreen() {
 
   useEffect(() => {
     if (!visible || progress !== 100 || preview) return;
-    const remaining = Math.max(0, (reduced ? 250 : 1350) - (performance.now() - started.current));
+    const remaining = Math.max(0, (reduced ? 2000 : 2500) - (performance.now() - started.current));
     const timer = setTimeout(() => { releasePortfolio(); setExiting(true); }, remaining);
     return () => clearTimeout(timer);
   }, [progress, visible, reduced, preview]);
@@ -83,6 +83,7 @@ export function LoadingScreen() {
           <source media="(max-width: 809px)" srcSet={mediaUrl('/loading/marble-phone.webp')} />
           <img src={mediaUrl('/loading/marble-desktop.webp')} alt="" width={1440} height={900} decoding="async" />
         </picture>
+        <div className="loading-grain" />
       </div>
       <img className="loading-brand" src={editorLogo} alt="" aria-hidden="true" width={110} height={50} />
       <div className="loading-progress" role="progressbar" aria-label="Loading portfolio" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}>

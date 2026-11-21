@@ -92,7 +92,11 @@ void main() {
     color = mix(background, shaded, smoothstep(0., .014, discriminant));
   }
   color = pow(max(color, vec3(0.)), vec3(1. / 2.2));
-  color += (hash(vec3(gl_FragCoord.xy, 7.)) - .5) / 300.;
+  // Advected, interpolated noise has no repeating frame cycle or hard flashes.
+  vec2 flow = vec2(u_time * 5.4, u_time * 2.7) + vec2(sin(u_time * .23), cos(u_time * .19)) * 4.;
+  float fineGrain = noise(vec3(gl_FragCoord.xy * .78 + flow, .37));
+  float softGrain = noise(vec3(gl_FragCoord.xy * 1.31 - flow * .62, 2.4));
+  color += (fineGrain * .72 + softGrain * .28 - .5) * .025;
   fragColor = vec4(color, 1.);
 }`;
 
