@@ -1,28 +1,49 @@
 import { Play } from 'lucide-react';
-import { useRef } from 'react';
-import { m as motion, useInView, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { useEffect, useRef } from 'react';
+import { animate, m as motion, useInView, useMotionValue, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { durationLabel, mediaUrl } from '../data/content';
 import { visuals } from '../data/visuals';
 import { easeOutExpo, revealTiming } from '../lib/motionSettings';
 import type { Project } from '../types';
+import type { MotionValue } from 'motion/react';
+import type { RefObject } from 'react';
 
-export function MediaPanel({ item, onPlay, hero = false }: {
+export interface TheaterFocus {
+  x: MotionValue<number>;
+  y: MotionValue<number>;
+  scale: MotionValue<number>;
+  captionOpacity: MotionValue<number>;
+}
+
+export function MediaPanel({ item, onPlay, hero = false, buttonRef, focus }: {
   item: Project;
   onPlay: (project: Project) => void;
   hero?: boolean;
+  buttonRef?: RefObject<HTMLButtonElement | null>;
+  focus?: TheaterFocus;
 }) {
-  const ref = useRef<HTMLButtonElement>(null);
+  const ownRef = useRef<HTMLButtonElement>(null);
+  const ref = buttonRef ?? ownRef;
   const reduced = useReducedMotion();
   const entered = useInView(ref, { once: true, margin: revealTiming.margin });
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const imageY = useTransform(scrollYProgress, value => reduced ? '0%' : `${(0.5 - value) * 7}%`);
   const visible = reduced || entered;
+  const captionEntrance = useMotionValue(0);
+  const fullOpacity = useMotionValue(1);
+  const captionOpacity = useTransform([captionEntrance, focus?.captionOpacity ?? fullOpacity], values =>
+    (values[0] as number) * (values[1] as number));
+  useEffect(() => {
+    const control = animate(captionEntrance, visible ? 1 : 0, { duration: reduced ? 0 : 0.7, delay: reduced ? 0 : 0.12 });
+    return () => control.stop();
+  }, [visible, reduced, captionEntrance]);
   const poster = item.poster?.startsWith('/posters/') ? mediaUrl(item.poster) : (item.poster || visuals.hero);
   return (
     <figure className={'media-panel' + (hero ? ' hero-media' : ' showreel-media')}>
       <motion.button ref={ref} className="media-panel-button" onClick={() => onPlay(item)} aria-label={
         item.isPlaceholder ? 'Preview the showreel space, original footage coming soon' : 'Play showreel'
       }
+        style={focus ? { x: focus.x, y: focus.y, scale: focus.scale, transformOrigin: '0% 0%' } : undefined}
         initial={reduced ? false : { clipPath: 'inset(100% 0% 0% 0%)' }}
         animate={{ clipPath: visible ? 'inset(0% 0% 0% 0%)' : 'inset(100% 0% 0% 0%)' }}
         transition={{ duration: reduced ? 0 : revealTiming.figure.duration, ease: easeOutExpo }}>
@@ -50,8 +71,7 @@ export function MediaPanel({ item, onPlay, hero = false }: {
           <span className="play-label">Watch showreel</span>
         </span>
       </motion.button>
-      <motion.figcaption className="media-caption" initial={reduced ? false : { opacity: 0 }} animate={{ opacity: visible ? 1 : 0 }}
-        transition={{ duration: reduced ? 0 : 0.7, delay: reduced ? 0 : 0.12 }}>
+      <motion.figcaption className="media-caption" style={{ opacity: captionOpacity }}>
         <span>{hero ? 'The showreel' : 'Dedicated showreel'}</span>
         <span className="muted">{item.isPlaceholder ? 'Original footage coming soon' : durationLabel(item.duration)}</span>
       </motion.figcaption>

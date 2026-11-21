@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useReducedMotion, useScroll, useTransform } from 'motion/react';
 import type { CSSProperties, RefObject } from 'react';
 
@@ -13,7 +13,6 @@ export function usePinnedScene(scene: RefObject<HTMLElement | null>, stage: RefO
   const { scrollYProgress } = useScroll({ target: scene,
     offset: [arrival ? 'start 0.75' : 'start start', `end ${metrics.height}px`] });
   const progress = useTransform(scrollYProgress, value => metrics.mode === 'on' && !reduced ? Math.max(0, Math.min(1, value)) : 0);
-  const measured = useRef(false);
 
   useEffect(() => {
     const element = stage.current;
@@ -25,7 +24,6 @@ export function usePinnedScene(scene: RefObject<HTMLElement | null>, stage: RefO
       const eligible = !reduced && innerWidth >= minimumWidth && innerHeight >= minimumHeight
         && (!fitStage || height <= innerHeight + 1);
       const mode = eligible ? 'on' : 'off';
-      measured.current = true;
       setMetrics(previous => previous.height === height && previous.mode === mode ? previous : { height, mode });
     };
     const observer = new ResizeObserver(measure);
