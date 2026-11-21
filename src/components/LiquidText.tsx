@@ -1,13 +1,14 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { useInView, useMotionValueEvent, useReducedMotion, useScroll } from 'motion/react';
 import type { ReactNode, RefObject } from 'react';
+import type { MotionValue } from 'motion/react';
 
 const svgNamespace = 'http://www.w3.org/2000/svg';
 let filterSequence = 0;
 
 // The downloaded reference uses a blur and alpha threshold to resolve liquid
 // lettering as it enters the viewport. Keep its curve and filter coefficients.
-function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false) {
+function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false, drive?: MotionValue<number>) {
   const reduced = useReducedMotion();
   const nearby = useInView(target, { margin: '500px 0px', once: true });
   const [phone, setPhone] = useState(false);
@@ -25,7 +26,8 @@ function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false) {
       : ['start end', 'start 0.4'],
   });
   const draw = useRef<(progress: number) => void>(() => {});
-  useMotionValueEvent(scrollYProgress, 'change', progress => draw.current(progress));
+  const progressValue = drive ?? scrollYProgress;
+  useMotionValueEvent(progressValue, 'change', progress => draw.current(progress));
 
   useEffect(() => {
     const root = target.current;
@@ -94,7 +96,7 @@ function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false) {
         record.filter.setAttribute('height', (1 + 2 * padding / height).toFixed(4));
         record.last = -1;
       });
-      draw.current(scrollYProgress.get());
+      draw.current(progressValue.get());
     };
     const observer = new ResizeObserver(measure);
     observer.observe(root);
@@ -112,7 +114,7 @@ function useLiquidReveal(target: RefObject<HTMLElement | null>, words = false) {
         record.element.style.removeProperty('--liquid');
       });
     };
-  }, [target, reduced, words, scrollYProgress, nearby]);
+  }, [target, reduced, words, progressValue, nearby]);
 }
 
 export function LiquidHeading({ id, className, children }: { id: string; className: string; children: ReactNode }) {
@@ -121,9 +123,11 @@ export function LiquidHeading({ id, className, children }: { id: string; classNa
   return <h2 id={id} className={className + ' liquid-heading'} ref={ref}>{children}</h2>;
 }
 
-export function LiquidLede({ className, text, children }: { className: string; text: string; children: ReactNode }) {
+export function LiquidLede({ className, text, children, progress }: {
+  className: string; text: string; children: ReactNode; progress?: MotionValue<number>;
+}) {
   const ref = useRef<HTMLParagraphElement>(null);
-  useLiquidReveal(ref, true);
+  useLiquidReveal(ref, true, progress);
   const words = text.split(/\s+/);
   return (
     <p className={className} ref={ref}>

@@ -1,17 +1,24 @@
 import { UserRound } from 'lucide-react';
+import { useRef } from 'react';
 import { portfolio, mediaUrl } from '../data/content';
 import { Reveal } from './Reveal';
 import { LiquidLede } from './LiquidText';
 import { LineReveal } from './LineReveal';
+import { usePinnedScene } from '../lib/usePinnedScene';
 
 export function About() {
+  const sceneRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const scene = usePinnedScene(sceneRef, stageRef, { minimumWidth: 1024, minimumHeight: 720, fitStage: true, arrival: true });
   const tools = portfolio.software.length ? portfolio.software : ['[Editing software]', '[Colour tools]', '[Audio tools]'];
   return (
-    <section id="about" className="f-sec f-about chapter-section" data-tone="white" aria-labelledby="about-title">
+    <section id="about" className="f-sec f-about chapter-section scroll-scene about-scroll-scene" data-tone="white" aria-labelledby="about-title"
+      ref={sceneRef} data-pin-state={scene.mode} style={scene.style}>
+      <div className="scene-stage about-story" ref={stageRef}>
       <div className="f-grid">
         <h2 id="about-title" className="sr-only">About me</h2>
         <div className="about-lede-wrap">
-          <LiquidLede className="f-lede" text={portfolio.about.biography}>
+          <LiquidLede className="f-lede" text={portfolio.about.biography} progress={scene.enabled ? scene.progress : undefined}>
             <span className="f-w">I'm</span>{' '}<span className="f-w">{portfolio.identity.name}.</span>{' '}
             <span className="f-w f-face" role="img" aria-label={portfolio.about.photograph ? portfolio.identity.name : 'Profile photograph placeholder'}>
               {portfolio.about.photograph
@@ -54,6 +61,7 @@ export function About() {
           </div>
         </Reveal>
       )}
+      </div>
     </section>
   );
 }
