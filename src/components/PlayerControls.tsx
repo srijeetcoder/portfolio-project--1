@@ -162,12 +162,12 @@ export function PlayerControls({ videoRef, dialogRef, disabled }: {
       </div>
       <div className="player-control-row">
         <button className="player-control-button" onClick={togglePlay} disabled={disabled} aria-label={playing ? 'Pause video' : 'Play video'}>
-          {playing ? <Pause size={20} fill="currentColor" strokeWidth={0} /> : <Play size={20} fill="currentColor" strokeWidth={0} />}
+          {playing ? <Pause size={20} fill="currentColor" strokeWidth={0} aria-hidden="true" /> : <Play size={20} fill="currentColor" strokeWidth={0} aria-hidden="true" />}
         </button>
         <span className="player-time"><span ref={current}>0:00</span><span aria-hidden="true"> / </span><span>{clock(duration)}</span></span>
         <div className="player-sound">
           <button className="player-control-button" onClick={toggleMute} disabled={disabled} aria-label={muted ? 'Unmute video' : 'Mute video'}>
-            {muted ? <VolumeX size={20} strokeWidth={1.4} /> : <Volume2 size={20} strokeWidth={1.4} />}
+            {muted ? <VolumeX size={20} strokeWidth={1.4} aria-hidden="true" /> : <Volume2 size={20} strokeWidth={1.4} aria-hidden="true" />}
           </button>
           <input ref={volume} className="player-volume" type="range" min={0} max={1} step={.05} defaultValue={0} aria-label="Video volume" disabled={disabled}
             onInput={event => {
@@ -178,7 +178,7 @@ export function PlayerControls({ videoRef, dialogRef, disabled }: {
             }} />
         </div>
         {canFullscreen && <button className="player-control-button player-fullscreen" onClick={() => void toggleFullscreen()} aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>
-          {fullscreen ? <Minimize size={19} strokeWidth={1.4} /> : <Maximize size={19} strokeWidth={1.4} />}
+          {fullscreen ? <Minimize size={19} strokeWidth={1.4} aria-hidden="true" /> : <Maximize size={19} strokeWidth={1.4} aria-hidden="true" />}
         </button>}
       </div>
     </div>

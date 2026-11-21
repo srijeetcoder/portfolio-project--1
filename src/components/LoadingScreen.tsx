@@ -27,7 +27,7 @@ export function LoadingScreen() {
   useEffect(() => {
     if (!visible) return;
     const previousOverflow = document.documentElement.style.overflow;
-    const targets = [...document.querySelectorAll<HTMLElement>('main, .site-header, .site-footer')];
+    const targets = [...document.querySelectorAll<HTMLElement>('main, .site-header, .site-footer, .skip-link')];
     const previousInert = targets.map(element => element.inert);
     document.documentElement.style.overflow = 'hidden';
     targets.forEach(element => { element.inert = true; });
