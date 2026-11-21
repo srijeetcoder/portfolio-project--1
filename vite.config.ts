@@ -14,6 +14,7 @@ export default defineConfig({
     {
       name: 'local-portfolio-media',
       configureServer(server) {
+        server.middlewares.use('/previews', serveStatic(resolve('videos/.previews'), { fallthrough: false, index: false }));
         // Stream originals directly from the requested videos folder, including byte ranges.
         server.middlewares.use('/videos', serveStatic(resolve('videos'), {
           fallthrough: false,
@@ -21,6 +22,7 @@ export default defineConfig({
         }));
       },
       configurePreviewServer(server) {
+        server.middlewares.use('/previews', serveStatic(resolve(server.config.build.outDir, 'videos/.previews'), { fallthrough: false, index: false }));
         server.middlewares.use('/videos', serveStatic(resolve(server.config.build.outDir, 'videos'), {
           fallthrough: false,
           index: false,

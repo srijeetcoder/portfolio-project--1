@@ -181,7 +181,7 @@ async function createPreview(file, metadata, id, fingerprint) {
       '-vf', 'scale=960:960:force_original_aspect_ratio=decrease:force_divisible_by=2,fps=24',
       '-c:v', 'libx264', '-preset', 'fast', '-crf', '26', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', output,
     ], { timeout: 90000, windowsHide: true });
-    return [{ src: '/videos/.previews/' + name, type: 'video/mp4' }];
+    return [{ src: '/previews/' + name, type: 'video/mp4' }];
   } catch { return []; }
 }
 
