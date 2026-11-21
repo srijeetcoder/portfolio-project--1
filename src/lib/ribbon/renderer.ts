@@ -29,7 +29,7 @@ interface Card {
   poster: WebGLTexture | null; posterSource: string; videoTexture: WebGLTexture | null;
   video: HTMLVideoElement | null; videoSize: [number, number]; videoFrame: number | null; videoDirty: boolean;
   pointer: { x: number; y: number } | null; mouse: { x: number; y: number };
-  hover: Tween; fade: Tween; drawn: boolean; focused: boolean; dx: number; captionOpacity: string; captionPosition: string; cuePosition: string;
+  hover: Tween; fade: Tween; drawn: boolean; focused: boolean; dx: number; captionHeight: number; captionOpacity: string; captionPosition: string; cuePosition: string;
   flat: number; lift: number; stretch: [number, number];
   disposeEvents: () => void;
 }
@@ -161,7 +161,7 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
     const card: Card = { element, hit, image, caption, cue, base: { left: 0, top: 0, width: 1, height: 1 }, pose: { x: 0, y: 0, w: 1, h: 1 },
       poster: null, posterSource: '', videoTexture: null, video: null, videoSize: [1, 1], videoFrame: null, videoDirty: false,
       pointer: null, mouse: { x: 0.5, y: 0.5 }, hover: { from: 0, to: 0, value: 0, started: 0, duration: 500 },
-      fade: { from: 0, to: 0, value: 0, started: 0, duration: 350 }, drawn: false, focused: false, dx: NaN, captionOpacity: '', captionPosition: '', cuePosition: '',
+      fade: { from: 0, to: 0, value: 0, started: 0, duration: 350 }, drawn: false, focused: false, dx: NaN, captionHeight: 0, captionOpacity: '', captionPosition: '', cuePosition: '',
       flat: 0, lift: 0, stretch: [0, 0], disposeEvents: () => {} };
     const hoverTo = (value: number) => { card.hover = { ...card.hover, from: card.hover.value, to: value, started: lastTime || performance.now() }; dirty = true; };
     const enter = (event: PointerEvent) => {
@@ -228,6 +228,9 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
       const box = card.hit.getBoundingClientRect();
       card.base = { left: box.left - sectionBox.left, top: box.top - sectionBox.top, width: box.width, height: box.height };
       card.dx = NaN;
+      card.captionHeight = card.caption.offsetHeight;
+      card.caption.style.transform = ''; card.caption.style.translate = ''; card.caption.style.visibility = '';
+      card.captionPosition = ''; card.captionOpacity = '';
     });
     gl!.useProgram(program); matrix('projectionMatrix', projection); matrix('viewMatrix', view); vec3('cameraPosition', 0, 0, ribbonCamera.z);
     float('u_sheetT', settings.span); float('u_sheetC', settings.curve); float('u_sheetP', 1); float('u_bank', settings.bank);
@@ -372,7 +375,11 @@ export async function createRibbonRenderer(canvas: HTMLCanvasElement, section: H
           if (transform !== card.captionPosition) { card.captionPosition = transform; card.caption.style.transform = transform; }
           card.caption.style.visibility = card.drawn ? 'visible' : 'hidden';
         } else {
-          card.caption.style.translate = `${Math.round(settings.diagonal * (card.base.height / 2 - 9))}px 0`;
+          const point = projectPoint(card, 0, 1), bottom = projectPoint(card, 0, 0);
+          const y = clamp(point.y + 12, 96, height - card.captionHeight - 36) - rect.top;
+          const translate = `${Math.round(settings.diagonal * (card.base.height / 2 - 9))}px ${y.toFixed(1)}px`;
+          if (translate !== card.captionPosition) { card.captionPosition = translate; card.caption.style.translate = translate; }
+          card.caption.style.visibility = card.drawn && point.y < height - 42 && bottom.y > 80 ? 'visible' : 'hidden';
         }
         const cueActive = card.drawn && !held && (card.hover.to > 0 || focused);
         card.cue.classList.toggle('is-active', cueActive);

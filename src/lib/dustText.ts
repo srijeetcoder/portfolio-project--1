@@ -39,7 +39,7 @@ export async function mountDustText(root: HTMLElement, signal: AbortSignal): Pro
   if (!context) throw new Error('Particle canvas unavailable');
   const dot = sprite(false), haze = sprite(true);
   const words: Word[] = [...root.querySelectorAll<HTMLElement>('.f-w:not(.f-face)')].map((element, index, all) => ({
-    element, originalOpacity: element.style.opacity, opacity: -1, delay: index / Math.max(1, all.length - 1) * .28,
+    element, originalOpacity: element.style.opacity, opacity: -1, delay: index / Math.max(1, all.length - 1) * .46,
   }));
   const face = root.querySelector<HTMLElement>('.f-face');
   const originalFaceOpacity = face?.style.opacity || '';
@@ -74,8 +74,8 @@ export async function mountDustText(root: HTMLElement, signal: AbortSignal): Pro
     canvas.style.width = `${width}px`; canvas.style.height = `${height}px`;
     canvas.style.left = `${-bounds.left}px`; canvas.style.top = '-100px';
     context!.setTransform(ratio, 0, 0, ratio, 0, 0);
-    if (settled || progress >= .995) { finish(); return; }
-    const limit = width < 810 ? 3200 : 7200;
+    if (settled || progress >= .98) { finish(); return; }
+    const limit = width < 810 ? 2800 : 6400;
     const next: Particle[] = [];
     let candidates = 0;
     const mask = document.createElement('canvas'), paint = mask.getContext('2d', { willReadFrequently: true })!;
@@ -117,6 +117,7 @@ export async function mountDustText(root: HTMLElement, signal: AbortSignal): Pro
       }
     });
     particles = next;
+    words.forEach(word => { if (word.opacity < 0) wordOpacity(word, 0); });
     canvas.dataset.particleCount = String(particles.length);
     root.dataset.dustState = 'forming';
     render(lastTime || performance.now(), 0);
@@ -125,11 +126,11 @@ export async function mountDustText(root: HTMLElement, signal: AbortSignal): Pro
     lastTime = time;
     if (disposed || settled || !visible || document.hidden || scrollRuntime.paused) return;
     elapsed += Math.min(delta, 40) / 1000;
-    if (progress >= .995) { finish(); return; }
+    if (progress >= .98) { finish(); return; }
     context!.clearRect(0, 0, width, height);
     const values = words.map(word => {
-      const local = smooth(0, 1, clamp((progress - word.delay) / .72));
-      const opacity = smooth(.83, .995, local);
+      const local = smooth(0, 1, clamp((progress - word.delay) / .52));
+      const opacity = smooth(.8, .995, local);
       wordOpacity(word, opacity);
       return { local, opacity };
     });
@@ -167,7 +168,8 @@ export async function mountDustText(root: HTMLElement, signal: AbortSignal): Pro
     setProgress(value) {
       progress = Math.max(progress, clamp(value));
       root.dataset.dustProgress = progress.toFixed(3);
-      if (progress >= .995) finish();
+      if (progress >= .98) finish();
+      else render(lastTime || performance.now(), 0);
     },
     dispose() {
       disposed = true; unsubscribe(); intersection.disconnect(); resize.disconnect(); canvas.remove();
