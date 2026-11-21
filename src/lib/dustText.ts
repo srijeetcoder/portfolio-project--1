@@ -44,7 +44,7 @@ export async function mountDustText(root: HTMLElement, signal: AbortSignal): Pro
   const face = root.querySelector<HTMLElement>('.f-face');
   const originalFaceOpacity = face?.style.opacity || '';
   let particles: Particle[] = [], progress = 0, disposed = false, visible = false, settled = false;
-  let width = 1, height = 1, ratio = 1, lastTime = 0, elapsed = 0;
+  let width = 1, height = 1, ratio = 1, lastTime = 0, elapsed = 0, layoutKey = '';
   let seed = 2166136261;
   for (const character of root.textContent || '') seed = Math.imul(seed ^ character.charCodeAt(0), 16777619);
   const random = () => {
@@ -68,6 +68,12 @@ export async function mountDustText(root: HTMLElement, signal: AbortSignal): Pro
   function measure() {
     if (disposed) return;
     const bounds = root.getBoundingClientRect();
+    const measurements = words.map(word => ({ box: word.element.getBoundingClientRect(), style: getComputedStyle(word.element) }));
+    const nextLayout = [innerWidth, devicePixelRatio, root.offsetHeight, bounds.left,
+      ...measurements.map(({ box, style }, index) => [box.left - bounds.left, box.top - bounds.top, box.width, box.height,
+        style.font, style.letterSpacing, words[index].element.textContent].join(','))].join('|');
+    if (nextLayout === layoutKey) return;
+    layoutKey = nextLayout;
     width = innerWidth; height = Math.ceil(root.offsetHeight + 200);
     ratio = Math.min(1.5, devicePixelRatio || 1, Math.sqrt(1200000 / Math.max(1, width * height)));
     canvas.width = Math.max(1, Math.ceil(width * ratio)); canvas.height = Math.max(1, Math.ceil(height * ratio));
@@ -81,7 +87,7 @@ export async function mountDustText(root: HTMLElement, signal: AbortSignal): Pro
     const mask = document.createElement('canvas'), paint = mask.getContext('2d', { willReadFrequently: true })!;
     const stride = width < 810 ? 1.8 : 2.3;
     words.forEach((word, index) => {
-      const box = word.element.getBoundingClientRect(), style = getComputedStyle(word.element);
+      const { box, style } = measurements[index];
       mask.width = Math.max(1, Math.ceil(box.width + 10)); mask.height = Math.max(1, Math.ceil(box.height + 10));
       paint.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
       paint.textBaseline = 'alphabetic'; paint.fontKerning = 'normal';

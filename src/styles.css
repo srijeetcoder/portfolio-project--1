@@ -175,6 +175,7 @@ img, video { max-width: 100%; }
 .dust-text { position: relative; }
 .dust-field { position: absolute; max-width: none; pointer-events: none; z-index: 1; }
 .dust-text[data-dust-state="settled"] .f-w { will-change: auto; }
+.dust-text[data-dust-state="settled"] .dust-field { display: none; }
 .line-reveal__mask { display: block; overflow: clip; }
 .line-reveal__line { display: block; white-space: pre; }
 
