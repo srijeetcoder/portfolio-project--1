@@ -72,7 +72,7 @@ export function MediaPanel({ item, onPlay, hero = false, buttonRef, focus }: {
         </span>
       </motion.button>
       <motion.figcaption className="media-caption" style={{ opacity: captionOpacity }}>
-        <span>{hero ? 'The showreel' : 'Dedicated showreel'}</span>
+        <span>{hero ? 'The showreel' : item.categoryId === 'showreel' ? 'Dedicated showreel' : 'Featured edit: ' + item.title}</span>
         <span className="muted">{item.isPlaceholder ? 'Original footage coming soon' : durationLabel(item.duration)}</span>
       </motion.figcaption>
     </figure>

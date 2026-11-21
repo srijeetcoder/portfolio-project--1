@@ -79,7 +79,8 @@ function ProjectCard({ project, activePreview, onPreview, onPlay }: {
             <video ref={videoRef} className={'preview-video' + (videoReady ? ' preview-ready' : '')}
               muted loop playsInline autoPlay preload="none" aria-hidden="true" tabIndex={-1}
               onPlaying={() => setVideoReady(true)} onError={() => setVideoReady(false)}>
-              {project.sources.map(source => <source key={source.src} src={mediaUrl(source.src)} type={source.type} />)}
+              {(project.previewSources?.length ? project.previewSources : project.sources).map(source =>
+                <source key={source.src} src={mediaUrl(source.src)} type={source.type} />)}
             </video>
           )}
           <span className="project-hover-play" aria-hidden="true"><Play size={22} fill="currentColor" strokeWidth={0} /></span>
@@ -88,7 +89,7 @@ function ProjectCard({ project, activePreview, onPreview, onPlay }: {
       <div className="proj__cap project-caption">
         <h3 className="proj__title project-title">{project.title}</h3>
         <p className="proj__kind project-category">{project.category}{project.year ? ', ' + project.year : ''}</p>
-        <p className="project-description">{project.description}</p>
+        {project.description && <p className="project-description">{project.description}</p>}
       </div>
     </article>
   );

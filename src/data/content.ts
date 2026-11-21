@@ -20,8 +20,8 @@ function enrichProject(item: MediaLibrary['projects'][number]): Project {
   const details = portfolio.projects[item.file] ?? {};
   return {
     ...item,
-    title: details.title || item.filename,
-    description: details.description || '[Add a short project description.]',
+    title: details.title || item.filename.replace(/\.[^.]+$/, ''),
+    description: details.description || '',
     category: details.category || item.category,
     categoryId: details.category || item.categoryId,
     poster: details.poster || item.poster,
@@ -53,7 +53,8 @@ export const projects: Project[] = mediaLibrary.projects.length
     }));
 
 export const showreel: Project = mediaLibrary.showreel
-  ? { ...enrichProject(mediaLibrary.showreel), title: 'Showreel', description: '', category: 'Showreel' }
+  ? { ...enrichProject(mediaLibrary.showreel), title: 'Showreel', description: '', category: 'Showreel', categoryId: 'showreel' }
+  : mediaLibrary.projects.length ? { ...enrichProject(mediaLibrary.projects[0]), category: 'Featured edit', description: '' }
   : {
       id: 'showreel-placeholder',
       file: '',

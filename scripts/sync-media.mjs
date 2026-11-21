@@ -11,6 +11,7 @@ const run = promisify(execFile);
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const videoRoot = resolve(root, 'videos');
 const posterRoot = resolve(root, 'public/posters');
+const previewRoot = resolve(videoRoot, '.previews');
 const manifestPath = resolve(root, 'src/data/media.generated.json');
 const supported = new Map([['.mp4', 'video/mp4'], ['.webm', 'video/webm'], ['.m4v', 'video/mp4']]);
 const otherVideoFormats = new Set(['.mov', '.mkv', '.avi', '.wmv', '.mpeg', '.mpg']);
@@ -28,6 +29,7 @@ const categoryNames = {
 const warnings = [];
 await mkdir(videoRoot, { recursive: true });
 await mkdir(posterRoot, { recursive: true });
+await mkdir(previewRoot, { recursive: true });
 
 async function exists(path) {
   try {
@@ -42,6 +44,7 @@ async function walk(directory, prefix = '') {
   const entries = await readdir(directory, { withFileTypes: true });
   const paths = [];
   for (const entry of entries.sort((a, b) => a.name.localeCompare(b.name))) {
+    if (entry.name.startsWith('.')) continue;
     const relative = prefix + entry.name;
     if (entry.isDirectory()) {
       paths.push(...await walk(resolve(directory, entry.name), relative + '/'));
@@ -152,10 +155,34 @@ async function posterSources(output) {
 
 function category(relative) {
   const folder = relative.includes('/') ? relative.split('/')[0] : '';
+  if (/portfolio/i.test(folder)) return { categoryId: 'video', category: 'Video edit' };
   return {
     categoryId: folder || 'video',
     category: categoryNames[folder.toLowerCase()] || (folder ? folder.replaceAll('-', ' ').replaceAll('_', ' ') : 'Video projects'),
   };
+}
+
+const ordinalNames = ['FIRST', 'SECOND', 'THIRD', 'FOURTH', 'FIFTH', 'SIXTH', 'SEVENTH', 'EIGHTH', 'NINTH', 'TENTH'];
+function orderRank(item) {
+  const name = basename(item.file, extname(item.file)).toUpperCase();
+  const ordinal = ordinalNames.findIndex(word => new RegExp('^' + word + '(?:M)?(?:$|[\\s_.-])').test(name));
+  if (ordinal >= 0) return ordinal;
+  const numeric = name.match(/^(\d+)(?:$|[\s_.-])/);
+  return numeric ? Number(numeric[1]) - 1 : Infinity;
+}
+async function createPreview(file, metadata, id, fingerprint) {
+  if (!ffmpeg) return [];
+  const name = 'preview-' + id + '-' + fingerprint.slice(0, 10) + '.mp4';
+  const output = resolve(previewRoot, name);
+  try {
+    if (!await exists(output)) await run(ffmpeg, [
+      '-hide_banner', '-loglevel', 'error', '-y', '-ss', String(metadata.duration && metadata.duration > 6 ? 1.5 : 0),
+      '-i', resolve(videoRoot, file), '-t', String(Math.min(6, metadata.duration || 6)), '-an',
+      '-vf', 'scale=960:960:force_original_aspect_ratio=decrease:force_divisible_by=2,fps=24',
+      '-c:v', 'libx264', '-preset', 'fast', '-crf', '26', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', output,
+    ], { timeout: 90000, windowsHide: true });
+    return [{ src: '/videos/.previews/' + name, type: 'video/mp4' }];
+  } catch { return []; }
 }
 
 let previous = { showreel: null, projects: [] };
@@ -191,7 +218,8 @@ for (const [key, variants] of groups) {
   const cachedItem = cached.get(id);
   if (cachedItem?.fingerprint === fingerprint && cachedItem.poster && cachedItem.posterSources?.length && await exists(output) &&
       (await Promise.all(cachedItem.posterSources.map(source => exists(resolve(root, 'public', source.src.slice(1)))))).every(Boolean)) {
-    media.push(cachedItem);
+    const previewSources = await createPreview(file, cachedItem, id, fingerprint);
+    media.push({ ...cachedItem, ...category(file), previewSources });
     continue;
   }
   const metadata = await readMetadata(resolve(videoRoot, file));
@@ -207,10 +235,13 @@ for (const [key, variants] of groups) {
     poster: hasPoster ? '/posters/project-' + id + '.webp' : null,
     posterSources: hasPoster ? await posterSources(output) : [],
     ...metadata,
+    previewSources: await createPreview(file, metadata, id, fingerprint),
     ...category(file),
     fingerprint,
   });
 }
+
+media.sort((a, b) => orderRank(a) - orderRank(b) || a.file.localeCompare(b.file, undefined, { numeric: true }));
 
 const showreels = media.filter(item => /^(show[\s_-]?reel|demo[\s_-]?reel)([\s_-].*)?$/i.test(basename(item.file, extname(item.file))));
 showreels.sort((a, b) => (a.file.toLowerCase() === 'showreel.mp4' ? 0 : 1) - (b.file.toLowerCase() === 'showreel.mp4' ? 0 : 1));

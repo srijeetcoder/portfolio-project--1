@@ -8,6 +8,7 @@ export interface MediaItem {
   file: string;
   filename: string;
   sources: VideoSource[];
+  previewSources?: VideoSource[];
   poster: string | null;
   posterSources?: { src: string; width: number }[];
   width: number | null;
