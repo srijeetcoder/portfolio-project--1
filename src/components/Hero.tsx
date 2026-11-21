@@ -3,6 +3,7 @@ import { Play } from 'lucide-react';
 import { m as motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
 import { portfolio, showreel, mediaUrl } from '../data/content';
 import editorWordmark from '../../reference/images/editor-wordmark.svg';
+import heroPoster from '../../reference/images/reference-hero.webp';
 import { Availability } from './Availability';
 import { ReferenceBackdrop } from './ReferenceBackdrop';
 import { RollContent } from './RollContent';
@@ -31,7 +32,11 @@ export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
       style={{ '--wordmark-mask': 'url("' + mask + '")' } as CSSProperties}>
       <div className="hero-visual" aria-hidden="true">
         <motion.div className="hero__inner" style={{ y }}>
-          <div className="hero__gradient"><ReferenceBackdrop kind="hero" /></div>
+          <div className="hero__gradient">
+            <img className="hero-poster" src={heroPoster} alt="" aria-hidden="true" width={800} height={1417}
+              loading="eager" fetchPriority="high" decoding="async" />
+            <ReferenceBackdrop kind="hero" />
+          </div>
           <motion.div className="hero__logo-blend" aria-hidden="true"
             initial={{ opacity: 0, y: -60 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: reduced ? 0 : 1.1, ease: [0.11, 0.06, 0.18, 1] }}>

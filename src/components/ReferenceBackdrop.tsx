@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useInView, useReducedMotion } from 'motion/react';
 import { scrollRuntime } from '../lib/scrollRuntime';
+import { afterFirstPaint } from '../lib/afterFirstPaint';
 import type { GradientMount } from '../lib/GradientMount';
 
 export function ReferenceBackdrop({ kind }: { kind: 'hero' | 'closing' }) {
@@ -19,6 +20,8 @@ export function ReferenceBackdrop({ kind }: { kind: 'hero' | 'closing' }) {
     const controller = new AbortController();
     async function mount() {
       try {
+        await afterFirstPaint();
+        if (cancelled) return;
         const { mountReferenceBackdrop } = await import('../lib/mountReferenceBackdrop');
         if (cancelled) return;
         const instance = await mountReferenceBackdrop(element!, kind,

@@ -97,7 +97,9 @@ img, video { max-width: 100%; }
   -webkit-mask-image: linear-gradient(to bottom, #000 max(var(--wm-foot), calc(100% - 14vh)), transparent 100%);
   mask-image: linear-gradient(to bottom, #000 max(var(--wm-foot), calc(100% - 14vh)), transparent 100%);
 }
-.hero__gradient { background-image: url("../reference/images/reference-hero.webp"); }
+.hero__gradient { background: var(--black); }
+.hero-poster { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+.hero__gradient:has(.reference-backdrop.is-live) .hero-poster { visibility: hidden; }
 .hero__wordmark, .hero__silhouette {
   -webkit-mask-image: var(--wordmark-mask);
   mask-image: var(--wordmark-mask);
@@ -115,7 +117,7 @@ img, video { max-width: 100%; }
 .availability-confirmed .availability-dot { background: currentColor; box-shadow: 0 0 0 3px rgb(255 255 255 / .22); }
 .reference-backdrop { position: absolute; inset: 0; pointer-events: none; }
 .reference-backdrop canvas { display: block; width: 100%; height: 100%; }
-.reference-backdrop-hero { background: url("../reference/images/reference-hero.webp") center top / cover no-repeat; }
+.reference-backdrop-hero { background: transparent; }
 .reference-backdrop-hero.is-live { background: var(--black); }
 .reference-backdrop-closing {
   width: 131.875%; left: -17.2917%; right: auto;
@@ -418,7 +420,7 @@ img, video { max-width: 100%; }
 @media (max-width: 809.98px) {
   .topbar { top: 16px; }
   .topbar__logo img { width: 77px; height: 35px; }
-  .hero__gradient { background-image: url("../reference/images/reference-hero.webp"); }
+  .hero__gradient { background: var(--black); }
   .hero-visual {
     -webkit-mask-image: linear-gradient(to bottom, #000 max(var(--wm-foot), calc(100% - 16vh)), transparent 100%);
     mask-image: linear-gradient(to bottom, #000 max(var(--wm-foot), calc(100% - 16vh)), transparent 100%);
