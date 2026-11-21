@@ -27,6 +27,7 @@ export interface MediaLibrary {
 }
 
 export interface ProjectDetails {
+  posterTime?: number;
   title?: string;
   description?: string;
   category?: string;

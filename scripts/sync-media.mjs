@@ -27,6 +27,9 @@ const categoryNames = {
   other: 'Other work',
 };
 const warnings = [];
+let projectSettings = {};
+try { projectSettings = JSON.parse(await readFile(resolve(root, 'src/data/portfolio.json'), 'utf8')).projects || {}; }
+catch { /* File-based metadata remains a usable fallback. */ }
 await mkdir(videoRoot, { recursive: true });
 await mkdir(posterRoot, { recursive: true });
 await mkdir(previewRoot, { recursive: true });
@@ -112,7 +115,7 @@ async function compressedPoster(input, output) {
     .toFile(output);
 }
 
-async function createPoster(video, thumbnail, metadata, output) {
+async function createPoster(video, thumbnail, metadata, output, posterTime) {
   if (thumbnail) {
     try {
       await compressedPoster(await readFile(thumbnail), output);
@@ -126,7 +129,8 @@ async function createPoster(video, thumbnail, metadata, output) {
     return false;
   }
   try {
-    const seek = metadata.duration ? Math.min(2, metadata.duration / 4) : 0;
+    const seek = Number.isFinite(posterTime) ? Math.max(0, Math.min(posterTime, (metadata.duration || posterTime + 0.1) - 0.1))
+      : metadata.duration ? Math.min(2, metadata.duration / 4) : 0;
     const result = await run(ffmpeg, [
       '-hide_banner', '-loglevel', 'error',
       '-ss', String(seek), '-i', resolve(videoRoot, video),
@@ -170,14 +174,16 @@ function orderRank(item) {
   const numeric = name.match(/^(\d+)(?:$|[\s_.-])/);
   return numeric ? Number(numeric[1]) - 1 : Infinity;
 }
-async function createPreview(file, metadata, id, fingerprint) {
+async function createPreview(file, metadata, id, fingerprint, posterTime) {
   if (!ffmpeg) return [];
   const name = 'preview-' + id + '-' + fingerprint.slice(0, 10) + '.mp4';
   const output = resolve(previewRoot, name);
   try {
+    const seek = Number.isFinite(posterTime) ? Math.max(0, Math.min(posterTime, (metadata.duration || posterTime + 0.1) - 0.1))
+      : metadata.duration && metadata.duration > 6 ? 1.5 : 0;
     if (!await exists(output)) await run(ffmpeg, [
-      '-hide_banner', '-loglevel', 'error', '-y', '-ss', String(metadata.duration && metadata.duration > 6 ? 1.5 : 0),
-      '-i', resolve(videoRoot, file), '-t', String(Math.min(6, metadata.duration || 6)), '-an',
+      '-hide_banner', '-loglevel', 'error', '-y', '-ss', String(seek),
+      '-i', resolve(videoRoot, file), '-t', String(Math.min(6, (metadata.duration || 6 + seek) - seek)), '-an',
       '-vf', 'scale=960:960:force_original_aspect_ratio=decrease:force_divisible_by=2,fps=24',
       '-c:v', 'libx264', '-preset', 'fast', '-crf', '26', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', output,
     ], { timeout: 90000, windowsHide: true });
@@ -206,6 +212,7 @@ const media = [];
 for (const [key, variants] of groups) {
   variants.sort((a, b) => (extname(a).toLowerCase() === '.mp4' ? 0 : 1) - (extname(b).toLowerCase() === '.mp4' ? 0 : 1));
   const file = variants[0];
+  const posterTime = projectSettings[file]?.posterTime;
   const thumbnail = await findThumbnail(file);
   const id = createHash('sha256').update(key).digest('hex').slice(0, 12);
   const fileStats = await Promise.all(variants.map(variant => stat(resolve(videoRoot, variant))));
@@ -213,6 +220,7 @@ for (const [key, variants] of groups) {
   const fingerprint = createHash('sha256').update(JSON.stringify({
     files: fileStats.map(info => [info.size, info.mtimeMs]),
     thumbnail: thumbnail ? [thumbnail, thumbnailStats.size, thumbnailStats.mtimeMs] : null,
+    posterTime: Number.isFinite(posterTime) ? posterTime : null,
   })).digest('hex');
   const output = resolve(posterRoot, 'project-' + id + '.webp');
   const cachedItem = cached.get(id);
@@ -220,12 +228,12 @@ for (const [key, variants] of groups) {
   const cachedWidth = Math.max(0, ...(cachedItem?.posterSources || []).map(source => source.width));
   if (cachedWidth >= expectedWidth && cachedItem?.fingerprint === fingerprint && cachedItem.poster && cachedItem.posterSources?.length && await exists(output) &&
       (await Promise.all(cachedItem.posterSources.map(source => exists(resolve(root, 'public', source.src.slice(1)))))).every(Boolean)) {
-    const previewSources = await createPreview(file, cachedItem, id, fingerprint);
+    const previewSources = await createPreview(file, cachedItem, id, fingerprint, posterTime);
     media.push({ ...cachedItem, ...category(file), previewSources });
     continue;
   }
   const metadata = await readMetadata(resolve(videoRoot, file));
-  const hasPoster = await createPoster(file, thumbnail, metadata, output);
+  const hasPoster = await createPoster(file, thumbnail, metadata, output, posterTime);
   media.push({
     id,
     file,
@@ -237,7 +245,7 @@ for (const [key, variants] of groups) {
     poster: hasPoster ? '/posters/project-' + id + '.webp' : null,
     posterSources: hasPoster ? await posterSources(output) : [],
     ...metadata,
-    previewSources: await createPreview(file, metadata, id, fingerprint),
+    previewSources: await createPreview(file, metadata, id, fingerprint, posterTime),
     ...category(file),
     fingerprint,
   });

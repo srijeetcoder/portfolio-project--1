@@ -27,13 +27,13 @@
       "duration": 19.67,
       "previewSources": [
         {
-          "src": "/previews/preview-608edb1cb36d-b471e2b7c5.mp4",
+          "src": "/previews/preview-608edb1cb36d-55545bdbef.mp4",
           "type": "video/mp4"
         }
       ],
       "categoryId": "video",
       "category": "Video edit",
-      "fingerprint": "b471e2b7c55ede3ddc39fa655ca292945198e68bd8542211a597c9a79376ee33"
+      "fingerprint": "55545bdbefeb6e51509485809096c952654df0e1c19a75dbfee76dfd9fc40f95"
     },
     {
       "id": "cd4adc97e2d6",
@@ -65,13 +65,13 @@
       "duration": 25.8,
       "previewSources": [
         {
-          "src": "/previews/preview-cd4adc97e2d6-c84ed006e5.mp4",
+          "src": "/previews/preview-cd4adc97e2d6-2fd6f7033f.mp4",
           "type": "video/mp4"
         }
       ],
       "categoryId": "video",
       "category": "Video edit",
-      "fingerprint": "c84ed006e535b847f916e49a4b36b10aa7ed6d2d40525eb0655639d8bcddc0bf"
+      "fingerprint": "2fd6f7033f52e706c4f9c19072b5b783117c712350a98b5e33b9893f3206840b"
     },
     {
       "id": "a986baa8f097",
@@ -91,7 +91,7 @@
         },
         {
           "src": "/posters/project-a986baa8f097.webp",
-          "width": 720
+          "width": 900
         }
       ],
       "width": 720,
@@ -99,13 +99,13 @@
       "duration": 48.19,
       "previewSources": [
         {
-          "src": "/previews/preview-a986baa8f097-6df7723eff.mp4",
+          "src": "/previews/preview-a986baa8f097-42dd39d6d3.mp4",
           "type": "video/mp4"
         }
       ],
       "categoryId": "video",
       "category": "Video edit",
-      "fingerprint": "6df7723effe8f987a2b95ecb96bfea27735e51ea8abd69fdb0c36eb9af786041"
+      "fingerprint": "42dd39d6d3a26192744477be073ec815e57b1f54c4c49ecaffc833e1a17343f5"
     },
     {
       "id": "d0f3f9d32c24",
@@ -129,7 +129,7 @@
         },
         {
           "src": "/posters/project-d0f3f9d32c24.webp",
-          "width": 1280
+          "width": 1600
         }
       ],
       "width": 1280,
@@ -137,13 +137,13 @@
       "duration": 39.81,
       "previewSources": [
         {
-          "src": "/previews/preview-d0f3f9d32c24-2e20b65212.mp4",
+          "src": "/previews/preview-d0f3f9d32c24-11433a04f8.mp4",
           "type": "video/mp4"
         }
       ],
       "categoryId": "video",
       "category": "Video edit",
-      "fingerprint": "2e20b6521235b2efb2f4ff577a502d9e7b8d84e87316f170df1847bb90e72974"
+      "fingerprint": "11433a04f84c778eba17c023f808821f6105b77a0f271ec1c3572655ce1bc612"
     },
     {
       "id": "39ba4cfad93d",
@@ -163,7 +163,7 @@
         },
         {
           "src": "/posters/project-39ba4cfad93d.webp",
-          "width": 720
+          "width": 900
         }
       ],
       "width": 720,
@@ -171,13 +171,13 @@
       "duration": 30.59,
       "previewSources": [
         {
-          "src": "/previews/preview-39ba4cfad93d-0190db81a0.mp4",
+          "src": "/previews/preview-39ba4cfad93d-cf7a42cf82.mp4",
           "type": "video/mp4"
         }
       ],
       "categoryId": "video",
       "category": "Video edit",
-      "fingerprint": "0190db81a04e3dec9f0925cc702c6747feea334b9b38386a7034432a9d31d3c5"
+      "fingerprint": "cf7a42cf8222b72698fe0929f1272e801c125c1ee53459618798bf75ed480104"
     }
   ],
   "unsupportedFiles": [],
