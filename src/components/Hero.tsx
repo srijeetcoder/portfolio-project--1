@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Play } from 'lucide-react';
-import { animate, m as motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react';
+import { animate, m as motion, useMotionValue, useMotionValueEvent, useReducedMotion, useTransform } from 'motion/react';
 import { portfolio, showreel, mediaUrl } from '../data/content';
 import editorWordmark from '../../reference/images/editor-wordmark.svg';
 import heroPoster from '../../reference/images/reference-hero.webp';
@@ -14,17 +14,28 @@ import type { Project } from '../types';
 export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
   const sceneRef = useRef<HTMLElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
+  const copyRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const scene = usePinnedScene(sceneRef, heroRef);
   const entrance = useMotionValue(0);
-  const cameraY = useTransform(scene.progress, value => -scene.height * 0.22 * value * value);
-  const cameraScale = useTransform(scene.progress, [0, 0.5, 1], [1, 1.035, 1.1]);
-  const cameraTilt = useTransform(scene.progress, [0, 0.35, 1], [0, 0, -5]);
+  const shot = useTransform(scene.progress, value => value * value * (3 - 2 * value));
+  const cameraY = useTransform(shot, value => -scene.height * 0.2 * value);
+  const cameraScale = useTransform(shot, [0, 1], [1, 1.26]);
+  const cameraTilt = useTransform(shot, [0, 1], [0, -5]);
   const copyY = useTransform(scene.progress, value => -scene.height * 0.08 * value);
-  const copyExit = useTransform(scene.progress, [0.08, 0.5], [1, 0]);
+  const copyExit = useTransform(scene.progress, [0.12, 0.75], [1, 0]);
   const copyOpacity = useTransform([entrance, copyExit], values => (values[0] as number) * (values[1] as number));
   const fade = useTransform(scene.progress, [0.25, 1], [0, 1]);
   const mask = portfolio.hero.wordmarkImage ? mediaUrl(portfolio.hero.wordmarkImage) : editorWordmark;
+  useMotionValueEvent(scene.progress, 'change', value => {
+    if (copyRef.current) copyRef.current.inert = value >= 0.75;
+  });
+  useEffect(() => {
+    const element = copyRef.current;
+    if (!element) return;
+    element.inert = scene.progress.get() >= 0.75;
+    return () => { element.inert = false; };
+  }, [scene.progress]);
 
   useEffect(() => {
     const control = animate(entrance, 1, { duration: reduced ? 0 : 0.8, delay: reduced ? 0 : 0.2 });
@@ -52,7 +63,7 @@ export function Hero({ onPlay }: { onPlay: (project: Project) => void }) {
         <motion.div className="hero__fade" style={{ opacity: reduced ? 0 : fade }} />
       </div>
       <h1 className="sr-only" id="hero-title">{portfolio.identity.role}. {portfolio.hero.headline.join(' ')}</h1>
-      <motion.div className="atf-what hero-copy" style={{ y: copyY, opacity: copyOpacity }}>
+      <motion.div className="atf-what hero-copy" ref={copyRef} style={{ y: copyY, opacity: copyOpacity }}>
         <div className="atf-intro">
           <p className="atf-st hero-description">{portfolio.hero.introduction}</p>
           <div className="hero-actions">
